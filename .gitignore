@@ -1,0 +1,14 @@
+#IDEA Ignores
+*.iml
+*.ipr
+*.iws
+.idea/
+local.properties
+out/
+
+# Generic Android ignores
+bin/
+target
+gen/
+
+*.class
