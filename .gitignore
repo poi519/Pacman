@@ -12,3 +12,4 @@ target
 gen/
 
 *.class
+*.swp
