@@ -1,4 +1,3 @@
 package com.example.Pacman;
 
-abstract class Item implements Drawable {
-}
+enum Location {Space, Wall, Dot, Energizer}

@@ -9,11 +9,7 @@ import android.view.SurfaceView;
 class DrawingPanel extends SurfaceView implements SurfaceHolder.Callback {
     private final long TICK = 16;
     PanelThread _thread;
-    int position = 200;
-    int incr = 1;
     Game game;
-    //GameMap map = new GameMap(10, 10, 700, 800, 20, 20);
-    //Pacman pacman = new Pacman(map, 0, 0);
 
     class PanelThread extends Thread {
         private SurfaceHolder _surfaceHolder;

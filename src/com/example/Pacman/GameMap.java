@@ -5,14 +5,14 @@ public class GameMap {
     int cellWidth, cellHeight;
     int width, height;
 
-    Item [][] array;
+    Location[][] array;
 
     public GameMap(int tlx, int tly, int brx, int bry, int width, int height) {
         this.width = width;
         this.height = height;
         topLeftX = tlx;
         topLeftY = tly;
-        array = new Item[width][height];
+        array = new Location[width][height];
         cellWidth = (brx - tlx) / width;
         cellHeight= (bry - tly) / height;
     }
@@ -23,4 +23,6 @@ public class GameMap {
         res[1] = (int) (topLeftY + cellHeight * (y + 0.5));
         return res;
     }
+
+    void loadFile()
 }
