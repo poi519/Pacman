@@ -86,7 +86,7 @@ public class Pacman implements Drawable {
     }
 
     public void draw(Canvas c) {
-        int[] screenCoordinates = getMap().toScreenCoordinates(getX(), getY());
+        float[] screenCoordinates = Game.getInstance().getDisplayHelper().toScreenCoordinates(getX(), getY());
         //Log.d("Pacman", "Drawing pacman at " + screenCoordinates[0] + " " + screenCoordinates[1]);
         c.drawCircle(screenCoordinates[0], screenCoordinates[1], 20, getPaint());
     }
@@ -97,9 +97,9 @@ public class Pacman implements Drawable {
             setTicks(0);
             switch(getDirection()) {
                 case UP: setY(Math.max(0, getY() - 1)); break;
-                case DOWN: setY(Math.min(getMap().height - 1, getY() + 1)); break;
+                case DOWN: setY(Math.min(getMap().getHeight() - 1, getY() + 1)); break;
                 case LEFT: setX(Math.max(0, getX() - 1)); break;
-                case RIGHT: setX(Math.min(getMap().width - 1, getX() + 1)); break;
+                case RIGHT: setX(Math.min(getMap().getWidth() - 1, getX() + 1)); break;
             }
         }
     }

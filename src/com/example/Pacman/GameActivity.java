@@ -16,9 +16,10 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //Move creation of Pacman into Game class
-        GameMap map = new GameMap(10, 10, 700, 800, 20, 20);
+        GameMap map = new GameMap(20, 20);
         Pacman pacman = new Pacman(map, 0, 0);
-        game = new Game(map, pacman);
+        DisplayHelper dh = new DisplayHelper(10, 10, 810, 810);
+        game = Game.create(map, pacman, dh);
         DrawingPanel panel = new DrawingPanel(this, game);
         setContentView(panel);
 

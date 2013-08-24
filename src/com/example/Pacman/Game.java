@@ -3,6 +3,17 @@ package com.example.Pacman;
 public class Game {
     private Pacman pacman;
     private GameMap map;
+    private DisplayHelper displayHelper;
+
+    public DisplayHelper getDisplayHelper() {
+        return displayHelper;
+    }
+
+    public void setDisplayHelper(DisplayHelper displayHelper) {
+        this.displayHelper = displayHelper;
+    }
+
+    private static final Game instance = new Game();
 
     public GameMap getMap() {
         return map;
@@ -20,9 +31,16 @@ public class Game {
         this.pacman = pacman;
     }
 
+    private Game() {}
 
-    public Game(GameMap m, Pacman p) {
-        pacman = p;
-        map = m;
+    static public Game getInstance() {
+        return Game.instance;
+    }
+
+    static public Game create(GameMap m, Pacman p, DisplayHelper dh) {
+        Game.getInstance().setMap(m);
+        Game.getInstance().setPacman(p);
+        Game.getInstance().setDisplayHelper(dh);
+        return Game.getInstance();
     }
 }
