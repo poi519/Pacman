@@ -2,6 +2,8 @@ package com.example.Pacman;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -9,6 +11,8 @@ import android.view.SurfaceView;
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final long TICK = 16;
     GameThread _thread;
+    Paint paint = new Paint();
+
     Game game = Game.getInstance();
     float tlx, tly, brx, bry;
 
@@ -85,7 +89,16 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void onDraw(Canvas canvas) {
-        game.getPacman().draw(canvas);
+        drawPacman(canvas);
+    }
+
+    public void drawPacman(Canvas c) {
+        paint.setColor(Color.YELLOW);
+        paint.setStyle(Paint.Style.FILL);
+
+        Pacman pacman = game.getPacman();
+        float[] screenCoordinates = toScreenCoordinates(pacman.getX(), pacman.getY());
+        c.drawCircle(screenCoordinates[0], screenCoordinates[1], 20, paint);
     }
 
     @Override
@@ -98,6 +111,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         _thread = new GameThread(getHolder(), this); //Start the thread that
         _thread.setRunning(true);                     //will make calls to
         _thread.start();                              //onDraw()
+
+        tlx = 10; tly = 10;
+        brx = 810; bry = 810;
     }
 
     @Override

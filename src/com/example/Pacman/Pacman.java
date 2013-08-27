@@ -7,11 +7,10 @@ import android.util.Log;
 
 enum Direction {UP, DOWN, LEFT, RIGHT}
 
-public class Pacman implements Drawable {
+public class Pacman  {
     private int x;
     private int y;
     private GameMap map;
-    private Paint paint;
     private Direction direction;
     private int ticks;
     private double speed;
@@ -38,14 +37,6 @@ public class Pacman implements Drawable {
 
     public void setMap(GameMap map) {
         this.map = map;
-    }
-
-    public Paint getPaint() {
-        return paint;
-    }
-
-    public void setPaint(Paint paint) {
-        this.paint = paint;
     }
 
     public Direction getDirection() {
@@ -79,17 +70,9 @@ public class Pacman implements Drawable {
         setY(yy);
         setDirection(Direction.RIGHT);
         setTicks(0);
-        setSpeed(1.0);
-        setPaint(new Paint());
-        getPaint().setColor(Color.YELLOW);
-        getPaint().setStyle(Paint.Style.FILL);
+        setSpeed(2.0);
     }
 
-    public void draw(Canvas c) {
-        float[] screenCoordinates = Game.getInstance().getDisplayHelper().toScreenCoordinates(getX(), getY());
-        //Log.d("Pacman", "Drawing pacman at " + screenCoordinates[0] + " " + screenCoordinates[1]);
-        c.drawCircle(screenCoordinates[0], screenCoordinates[1], 20, getPaint());
-    }
 
     public void update() {
         setTicks(getTicks() + 1);

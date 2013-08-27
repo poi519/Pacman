@@ -18,14 +18,12 @@ public class GameActivity extends Activity {
         //Move creation of Pacman into Game class
         GameMap map = GameMap.loadFile(this, "level1.txt");
         Pacman pacman = new Pacman(map, 0, 0);
-        DisplayHelper dh = new DisplayHelper(10, 10, 810, 810);
-        game = Game.create(map, pacman, dh);
-        GameView panel = new GameView(this);
-        setContentView(panel);
+        game = Game.create(map, pacman);
+        GameView gameView = new GameView(this);
+        setContentView(gameView);
 
         final GestureDetector gdt = new GestureDetector(this, new FlingListener());
-        //final ImageView imageView  = (ImageView) findViewById(R.id.image_view);
-        panel.setOnTouchListener(new View.OnTouchListener() {
+        gameView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View view, final MotionEvent event) {
                 gdt.onTouchEvent(event);
