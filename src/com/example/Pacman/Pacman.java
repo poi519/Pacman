@@ -4,26 +4,29 @@ import android.util.Log;
 
 enum Direction {UP, DOWN, LEFT, RIGHT}
 
-public class Pacman  {
-    private int x;
-    private int y;
+public class Pacman  implements HasRadius {
+    private float x;
+    private float y;
     private Direction direction;
-    private int ticks;
-    private double speed;
+    private float speed;
 
-    public int getX() {
+    public float getRadius() {
+        return 0.5f;
+    }
+
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
@@ -36,19 +39,11 @@ public class Pacman  {
         this.direction = direction;
     }
 
-    public int getTicks() {
-        return ticks;
-    }
-
-    public void setTicks(int ticks) {
-        this.ticks = ticks;
-    }
-
-    public double getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 
-    public void setSpeed(double speed) {
+    public void setSpeed(float speed) {
         this.speed = speed;
     }
 
@@ -56,26 +51,24 @@ public class Pacman  {
         setX(xx);
         setY(yy);
         setDirection(Direction.RIGHT);
-        setTicks(0);
-        setSpeed(2.0);
+        setSpeed(2.0f);
     }
 
     public void update() {
-        setTicks(getTicks() + 1);
-        if(getTicks() / 60 * getSpeed() >= 1.0) {
-            setTicks(0);
+        float dr = getSpeed() * 1f / 60f;
+        if(true) {
             switch(getDirection()) {
                 case UP:
-                    setY(Math.max(0, getY() - 1));
+                    setY(Math.max(0, getY() - dr));
                     break;
                 case DOWN:
-                    setY(Math.min(Game.getInstance().getMap().getHeight() - 1, getY() + 1));
+                    setY(Math.min(Game.getInstance().getMap().getHeight() - 1, getY() + dr));
                     break;
                 case LEFT:
-                    setX(Math.max(0, getX() - 1));
+                    setX(Math.max(0, getX() - dr));
                     break;
                 case RIGHT:
-                    setX(Math.min(Game.getInstance().getMap().getWidth() - 1, getX() + 1));
+                    setX(Math.min(Game.getInstance().getMap().getWidth() - 1, getX() + dr));
                     break;
             }
         }

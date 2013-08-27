@@ -15,25 +15,28 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Game game = Game.getInstance();
     float tlx, tly, brx, bry;
 
-    public float cellWidth(GameMap map) {
-        return (brx - tlx) / map.getWidth();
+    public float getCellWidth() {
+        return (brx - tlx) / game.getMap().getWidth();
     }
 
-    public float cellHeight(GameMap map) {
-        return (bry - tly) / map.getHeight();
+    public float getCellHeight() {
+        return (bry - tly) / game.getMap().getHeight();
     }
 
-    public float[] toScreenCoordinates(int x, int y) {
-        GameMap map = Game.getInstance().getMap();
+    public float getScreenRadius(HasRadius smth) {
+        return Math.min(getCellHeight(), getCellWidth()) * smth.getRadius();
+    }
+
+    public float[] toScreenCoordinates(float x, float y) {
         float[] res = new float[2];
-        res[0] = (float) (tlx + cellWidth(map) * (x + 0.5));
-        res[1] = (float) (tly + cellHeight(map) * (y + 0.5));
+        res[0] = (tlx + getCellWidth() * (x + 0.5f));
+        res[1] = (tly + getCellHeight() * (y + 0.5f));
         return res;
     }
 
 
     class GameThread extends Thread {
-        private SurfaceHolder _surfaceHolder;
+        private final SurfaceHolder _surfaceHolder; //+final hope this works...
         private GameView _panel;
         private boolean _run = false;
 
@@ -80,7 +83,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-
     public GameView(Context context) {
         super(context);
         getHolder().addCallback(this);
@@ -88,6 +90,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void onDraw(Canvas canvas) {
+        drawMap(canvas);
         drawPacman(canvas);
     }
 
@@ -97,7 +100,57 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         Pacman pacman = game.getPacman();
         float[] screenCoordinates = toScreenCoordinates(pacman.getX(), pacman.getY());
-        c.drawCircle(screenCoordinates[0], screenCoordinates[1], 20, paint);
+        c.drawCircle(screenCoordinates[0], screenCoordinates[1], getScreenRadius(pacman), paint);
+    }
+
+    public void drawMap(Canvas c) {
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        c.drawRect(tlx, tly, brx, bry, paint);
+
+        GameMap map = game.getMap();
+        Location l;
+        for(int i = 0; i < map.getWidth(); ++i)
+            for(int j = 0; j < map.getHeight(); ++j) {
+                l = map.getArray()[i][j];
+                if(l == null) {
+                    Log.d("GameView.drawMap", "null location at " + i + " " + j);
+                    continue;
+                }
+                switch(l) {
+                    case Wall:
+                        drawWall(c, i, j);
+                        break;
+                    case Dot:
+                        drawDot(c, i, j);
+                        break;
+                    case Energizer:
+                        drawEnergizer(c, i, j);
+                        break;
+                }
+            }
+    }
+
+    public void drawWall(Canvas c, float x, float y) {
+        paint.setColor(Color.BLUE);
+        paint.setStyle(Paint.Style.FILL);
+        float[] tl = toScreenCoordinates(x - 0.5f, y - 0.5f);
+        float[] br = toScreenCoordinates(x + 0.5f, y + 0.5f);
+        c.drawRect(tl[0], tl[1], br[0], br[1], paint);
+    }
+
+    public void drawDot(Canvas c, float x, float y) {
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        float[] sc = toScreenCoordinates(x, y);
+        c.drawCircle(sc[0], sc[1], getScreenRadius(Location.Dot), paint);
+    }
+
+    public void drawEnergizer(Canvas c, float x, float y) {
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        float[] sc = toScreenCoordinates(x, y);
+        c.drawCircle(sc[0], sc[1], getScreenRadius(Location.Energizer), paint);
     }
 
     @Override
@@ -112,7 +165,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         _thread.start();                              //onDraw()
 
         tlx = 10; tly = 10;
-        brx = 810; bry = 810;
+        brx = this.getHeight(); bry = this.getHeight();
 
         final GestureDetector gdt = new GestureDetector(this.getContext(), new FlingListener());
         this.setOnTouchListener(new View.OnTouchListener() {

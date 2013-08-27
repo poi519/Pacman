@@ -1,9 +1,6 @@
 package com.example.Pacman;
 
-import android.content.Context;
-import android.content.res.AssetManager;
 import android.util.Log;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +17,9 @@ public class GameMap {
         setArray(new Location[width][height]);
     }
 
-    static GameMap loadFile(Context context, String filename) {
-        AssetManager am = context.getAssets();
-        InputStream fis = null;
+    static GameMap loadInputStream(InputStream fis) {
         GameMap map;
         try {
-            fis = am.open("maps/" + filename);
             map = GameMap.fromDimensionsInStream(fis);
             Log.d("GameMap.loadFile", "Map dimensions are" + map.getWidth() + " " + map.getHeight());
             map.readArrayFromStream(fis);
@@ -51,16 +45,6 @@ public class GameMap {
         return new GameMap(Integer.parseInt(dimStrings[0]), Integer.parseInt(dimStrings[1]));
     }
 
-    private static Location locationFromChar(char c) {
-        switch (c) {
-            case 'w' : return Location.Wall;
-            case ' ' : return Location.Space;
-            case '.' : return Location.Dot;
-            case 'e' : return Location.Energizer;
-            default: return Location.Space;
-        }
-    }
-
     private void readArrayFromStream(InputStream fis) throws IOException {
         int x = 0, y = 0;
         int i = fis.read();
@@ -68,10 +52,13 @@ public class GameMap {
         while(i != -1) {
             //Log.d("GameMap.readArrayFromStream", "Read " + Character.toString(c));
             if(c == '\n') {
+                if(x < getWidth() - 1)
+                    for(; x < getWidth(); x++)
+                        getArray()[x][y] = Location.Space;
                 x = 0;
                 y++;
             } else {
-                getArray()[x][y] = locationFromChar(c);
+                getArray()[x][y] = Location.fromChar(c);
                 x++;
             }
             i = fis.read();

@@ -28,9 +28,8 @@ public class Game {
         return Game.instance;
     }
 
-    static public Game create(GameMap m, Pacman p) {
-        Game.getInstance().setMap(m);
-        Game.getInstance().setPacman(p);
-        return Game.getInstance();
+    public void loadMap(GameMap map) {
+        setMap(map);
+        setPacman(new Pacman(14, 23));
     }
 }
