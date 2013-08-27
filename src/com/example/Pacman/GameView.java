@@ -6,17 +6,35 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-class DrawingPanel extends SurfaceView implements SurfaceHolder.Callback {
+class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final long TICK = 16;
-    PanelThread _thread;
-    Game game;
+    GameThread _thread;
+    Game game = Game.getInstance();
+    float tlx, tly, brx, bry;
 
-    class PanelThread extends Thread {
+    public float cellWidth(GameMap map) {
+        return (brx - tlx) / map.getWidth();
+    }
+
+    public float cellHeight(GameMap map) {
+        return (bry - tly) / map.getHeight();
+    }
+
+    public float[] toScreenCoordinates(int x, int y) {
+        GameMap map = Game.getInstance().getMap();
+        float[] res = new float[2];
+        res[0] = (float) (tlx + cellWidth(map) * (x + 0.5));
+        res[1] = (float) (tly + cellHeight(map) * (y + 0.5));
+        return res;
+    }
+
+
+    class GameThread extends Thread {
         private SurfaceHolder _surfaceHolder;
-        private DrawingPanel _panel;
+        private GameView _panel;
         private boolean _run = false;
 
-        public PanelThread(SurfaceHolder surfaceHolder, DrawingPanel panel) {
+        public GameThread(SurfaceHolder surfaceHolder, GameView panel) {
             _surfaceHolder = surfaceHolder;
             _panel = panel;
         }
@@ -60,9 +78,8 @@ class DrawingPanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-    public DrawingPanel(Context context, Game g) {
+    public GameView(Context context) {
         super(context);
-        game = g;
         getHolder().addCallback(this);
     }
 
@@ -78,7 +95,7 @@ class DrawingPanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         setWillNotDraw(false); //Allows us to use invalidate() to call onDraw()
-        _thread = new PanelThread(getHolder(), this); //Start the thread that
+        _thread = new GameThread(getHolder(), this); //Start the thread that
         _thread.setRunning(true);                     //will make calls to
         _thread.start();                              //onDraw()
     }
