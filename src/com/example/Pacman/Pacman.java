@@ -1,8 +1,5 @@
 package com.example.Pacman;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 
 enum Direction {UP, DOWN, LEFT, RIGHT}
@@ -10,7 +7,6 @@ enum Direction {UP, DOWN, LEFT, RIGHT}
 public class Pacman  {
     private int x;
     private int y;
-    private GameMap map;
     private Direction direction;
     private int ticks;
     private double speed;
@@ -29,14 +25,6 @@ public class Pacman  {
 
     public void setY(int y) {
         this.y = y;
-    }
-
-    public GameMap getMap() {
-        return map;
-    }
-
-    public void setMap(GameMap map) {
-        this.map = map;
     }
 
     public Direction getDirection() {
@@ -64,8 +52,7 @@ public class Pacman  {
         this.speed = speed;
     }
 
-    public Pacman(GameMap m, int xx, int yy){
-        setMap(m);
+    public Pacman(int xx, int yy){
         setX(xx);
         setY(yy);
         setDirection(Direction.RIGHT);
@@ -73,16 +60,23 @@ public class Pacman  {
         setSpeed(2.0);
     }
 
-
     public void update() {
         setTicks(getTicks() + 1);
         if(getTicks() / 60 * getSpeed() >= 1.0) {
             setTicks(0);
             switch(getDirection()) {
-                case UP: setY(Math.max(0, getY() - 1)); break;
-                case DOWN: setY(Math.min(getMap().getHeight() - 1, getY() + 1)); break;
-                case LEFT: setX(Math.max(0, getX() - 1)); break;
-                case RIGHT: setX(Math.min(getMap().getWidth() - 1, getX() + 1)); break;
+                case UP:
+                    setY(Math.max(0, getY() - 1));
+                    break;
+                case DOWN:
+                    setY(Math.min(Game.getInstance().getMap().getHeight() - 1, getY() + 1));
+                    break;
+                case LEFT:
+                    setX(Math.max(0, getX() - 1));
+                    break;
+                case RIGHT:
+                    setX(Math.min(Game.getInstance().getMap().getWidth() - 1, getX() + 1));
+                    break;
             }
         }
     }

@@ -66,7 +66,7 @@ public class GameMap {
         int i = fis.read();
         char c = (char) i;
         while(i != -1) {
-            Log.d("GameMap.readArrayFromStream", "Read " + Character.toString(c));
+            //Log.d("GameMap.readArrayFromStream", "Read " + Character.toString(c));
             if(c == '\n') {
                 x = 0;
                 y++;

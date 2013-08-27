@@ -5,8 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.*;
 
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final long TICK = 16;
@@ -114,6 +113,33 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         tlx = 10; tly = 10;
         brx = 810; bry = 810;
+
+        final GestureDetector gdt = new GestureDetector(this.getContext(), new FlingListener());
+        this.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(final View view, final MotionEvent event) {
+                gdt.onTouchEvent(event);
+                return true;
+            }
+        });
+    }
+
+    class FlingListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.d("onFling", "Entering method");
+            float dx = e2.getX() - e1.getX();
+            float dy = e2.getY() - e1.getY();
+            Log.d("onFling", "dx, dy = " + dx + " " + dy);
+            if(Math.abs(dx) > Math.abs(dy)) {
+                //Horizontal fling
+                game.getPacman().setDirection(dx > 0 ? Direction.RIGHT : Direction.LEFT);
+            } else {
+                //Vertical fling
+                game.getPacman().setDirection(dy > 0 ? Direction.DOWN : Direction.UP);
+            }
+            return true;
+        }
     }
 
     @Override
