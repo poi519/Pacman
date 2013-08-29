@@ -186,10 +186,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             Log.d("onFling", "dx, dy = " + dx + " " + dy);
             if(Math.abs(dx) > Math.abs(dy)) {
                 //Horizontal fling
-                game.getPacman().setDirection(dx > 0 ? Direction.RIGHT : Direction.LEFT);
+                game.getPacman().scheduleDirectionChange(dx > 0 ? Direction.RIGHT : Direction.LEFT);
             } else {
                 //Vertical fling
-                game.getPacman().setDirection(dy > 0 ? Direction.DOWN : Direction.UP);
+                game.getPacman().scheduleDirectionChange(dy > 0 ? Direction.DOWN : Direction.UP);
             }
             return true;
         }

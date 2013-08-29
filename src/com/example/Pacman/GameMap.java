@@ -89,4 +89,8 @@ public class GameMap {
     public void setArray(Location[][] array) {
         this.array = array;
     }
+
+    public Location getLocation(float[] cell) {
+        return getArray()[(int) cell[0]][(int) cell[1]];
+    }
 }
