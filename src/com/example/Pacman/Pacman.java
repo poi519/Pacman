@@ -19,7 +19,7 @@ enum Direction {
         return result;
     }
 
-    private boolean isHorizontal() {
+    public boolean isHorizontal() {
         switch(this) {
             case LEFT:
             case RIGHT:
@@ -32,6 +32,7 @@ enum Direction {
     public boolean isCollinear(Direction other) {
         return (this.isHorizontal() == other.isHorizontal());
     }
+
 }
 
 public class Pacman  implements HasRadius {
@@ -87,8 +88,6 @@ public class Pacman  implements HasRadius {
         //Log.d("setDirection", "direction set to" + direction.toString());
         this.direction = direction;
     }
-
-
 
     public float getSpeed() {
         return speed;
@@ -179,5 +178,4 @@ public class Pacman  implements HasRadius {
             setY(newY);
         }
     }
-
 }

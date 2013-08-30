@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.*;
 
@@ -34,6 +35,15 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return res;
     }
 
+    public float toAngle(Direction dir) {
+        switch(dir) {
+            case RIGHT: return 0;
+            case LEFT: return 180;
+            case DOWN: return 90;
+            case UP: return 270;
+            default: return 0;
+        }
+    }
 
     class GameThread extends Thread {
         private final SurfaceHolder _surfaceHolder; //+final hope this works...
@@ -99,14 +109,23 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStyle(Paint.Style.FILL);
 
         Pacman pacman = game.getPacman();
-        float[] screenCoordinates = toScreenCoordinates(pacman.getX(), pacman.getY());
-        c.drawCircle(screenCoordinates[0], screenCoordinates[1], getScreenRadius(pacman), paint);
+        //float[] screenCoordinates = toScreenCoordinates(pacman.getX(), pacman.getY());
+        //c.drawCircle(screenCoordinates[0], screenCoordinates[1], getScreenRadius(pacman), paint);
+
+        float[] screentl = toScreenCoordinates(pacman.getX() - 0.5f, pacman.getY() - 0.5f);
+        float[] screenbr = toScreenCoordinates(pacman.getX() + 0.5f, pacman.getY() + 0.5f);
+        float zeroAngle = toAngle(pacman.getDirection());
+        float coordinate = pacman.getDirection().isHorizontal() ? pacman.getX() : pacman.getY();
+        float mouthAngle = (float) Math.abs(90 * Math.sin(Math.PI * (coordinate - Math.floor(coordinate))));//YEAH!
+        c.drawArc(new RectF(screentl[0], screentl[1], screenbr[0], screenbr[1]),
+                zeroAngle + mouthAngle / 2,
+                360 - mouthAngle, true, paint);
     }
 
     public void drawMap(Canvas c) {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
-        c.drawRect(tlx, tly, brx, bry, paint);
+        c.drawRect(0, 0, c.getWidth(), c.getHeight(), paint);
 
         GameMap map = game.getMap();
         Location l;
