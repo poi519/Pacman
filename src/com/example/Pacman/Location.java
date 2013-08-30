@@ -20,4 +20,12 @@ enum Location implements HasRadius {
             default: return 0.5f;
         }
     }
+
+    public int getScore() {
+        switch(this) {
+            case Dot: return 100;
+            case Energizer: return 1000;
+            default: return 0;
+        }
+    }
 }

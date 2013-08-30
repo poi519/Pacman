@@ -93,4 +93,8 @@ public class GameMap {
     public Location getLocation(float[] cell) {
         return getArray()[(int) cell[0]][(int) cell[1]];
     }
+
+    public void setLocation(float[] cell, Location value) {
+        getArray()[(int) cell[0]][(int) cell[1]] = value;
+    }
 }

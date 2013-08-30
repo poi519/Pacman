@@ -145,28 +145,23 @@ public class Pacman  implements HasRadius {
         if(isMoving()) {
             switch(getDirection()) {
                 case UP:
-                    newY = Math.max(0, getY() - dr);
-                    break;
+                    newY = getY() - dr; break;
                 case DOWN:
-                    newY = Math.min(Game.getInstance().getMap().getHeight() - 1, getY() + dr);
-                    break;
+                    newY = getY() + dr; break;
                 case LEFT:
-                    newX = Math.max(0, getX() - dr);
-                    break;
+                    newX = getX() - dr; break;
                 case RIGHT:
-                    newX = Math.min(Game.getInstance().getMap().getWidth() - 1, getX() + dr);
-                    break;
+                    newX = getX() + dr; break;
             }
-            //Check for wall
             if((Math.floor(newX) != Math.floor(getX())
                 || Math.floor(newY) != Math.floor(getY()))) {     //passed through a cell center;
+                eat();
                 if(getScheduledDirection() != getDirection())    //direction change was scheduled
                     if(changeDirection())
                         return;
-
+                //Check for wall
                 float[] nextCell = getDirection().nextCell(newX, newY);
                 Location nextLocation = Game.getInstance().getMap().getLocation(nextCell);
-                Log.d("Pacman.update", "Next location is " + nextLocation);
                 if(nextLocation == Location.Wall) {
                     setMoving(false);
                     setX(Math.round(newX));
@@ -176,6 +171,20 @@ public class Pacman  implements HasRadius {
             }
             setX(newX);
             setY(newY);
+        } else {
+            eat();
+        }
+    }
+
+    public void eat(){
+        float[] coordinates = {Math.round(getX()), Math.round(getY())};
+        GameMap map = Game.getInstance().getMap();
+        Location location = map.getLocation(coordinates);
+        switch(location){
+            case Dot:
+            case Energizer:
+                map.setLocation(coordinates, Location.Space);
+                Game.getInstance().increaseScore(location.getScore());
         }
     }
 }

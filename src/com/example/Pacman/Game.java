@@ -3,8 +3,12 @@ package com.example.Pacman;
 public class Game {
     private Pacman pacman;
     private GameMap map;
-
+    private long score = 0;
     private static final Game instance = new Game();
+
+    public long getScore() {
+        return score;
+    }
 
     public GameMap getMap() {
         return map;
@@ -31,5 +35,9 @@ public class Game {
     public void loadMap(GameMap map) {
         setMap(map);
         setPacman(new Pacman(14, 23));
+    }
+
+    public void increaseScore(int amount) {
+        score += amount;
     }
 }
