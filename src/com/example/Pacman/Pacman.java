@@ -153,8 +153,8 @@ public class Pacman  implements HasRadius {
                 case RIGHT:
                     newX = getX() + dr; break;
             }
-            if((Math.floor(newX) != Math.floor(getX())
-                || Math.floor(newY) != Math.floor(getY()))) {     //passed through a cell center;
+            if(((int) newX != (int) getX()
+                || (int) newY != (int) getY())) {     //passed through a cell center;
                 eat();
                 if(getScheduledDirection() != getDirection())    //direction change was scheduled
                     if(changeDirection())

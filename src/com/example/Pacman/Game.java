@@ -3,7 +3,7 @@ package com.example.Pacman;
 public class Game {
     private Pacman pacman;
     private GameMap map;
-    private long score = 0;
+    private long score;
     private static final Game instance = new Game();
 
     public long getScore() {
@@ -26,7 +26,9 @@ public class Game {
         this.pacman = pacman;
     }
 
-    private Game() {}
+    private Game() {
+        score = 0;
+    }
 
     static public Game getInstance() {
         return Game.instance;
