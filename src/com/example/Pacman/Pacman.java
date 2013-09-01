@@ -106,16 +106,16 @@ public class Pacman  implements HasRadius {
         setMoving(false);
     }
 
-    private boolean changeDirection() {
+    private boolean tryChangeDirection() {
         float[] nextCell = getScheduledDirection().nextCell(getX(), getY());
         Location nextLocation = Game.getInstance().getMap().getLocation(nextCell);
         if(nextLocation == Location.Wall) {
-            Log.d("Pacman.changeDirection", "Direction cannot be changed because there is wall in direction "
+            Log.d("Pacman.tryChangeDirection", "Direction cannot be changed because there is wall in direction "
                     + getScheduledDirection());
             setScheduledDirection(getDirection());
             return false;
         } else {
-            Log.d("Pacman.changeDirection", "Direction changed to " + getScheduledDirection());
+            Log.d("Pacman.tryChangeDirection", "Direction changed to " + getScheduledDirection());
             setDirection(getScheduledDirection());
             setX(Math.round(getX()));
             setY(Math.round(getY()));
@@ -142,7 +142,7 @@ public class Pacman  implements HasRadius {
         float dr = getSpeed() * 1f / 60f;
         float newX = getX();
         float newY = getY();
-        if(isMoving()) {
+        if(moving) {
             switch(getDirection()) {
                 case UP:
                     newY = getY() - dr; break;
@@ -153,27 +153,40 @@ public class Pacman  implements HasRadius {
                 case RIGHT:
                     newX = getX() + dr; break;
             }
-            if(((int) newX != (int) getX()
-                || (int) newY != (int) getY())) {     //passed through a cell center;
-                eat();
-                if(getScheduledDirection() != getDirection())    //direction change was scheduled
-                    if(changeDirection())
-                        return;
-                //Check for wall
-                float[] nextCell = getDirection().nextCell(newX, newY);
-                Location nextLocation = Game.getInstance().getMap().getLocation(nextCell);
-                if(nextLocation == Location.Wall) {
-                    setMoving(false);
-                    setX(Math.round(newX));
-                    setY(Math.round(newY));
-                    return;
-                }
+            if(((int) newX != (int) x
+                || (int) newY != (int) y)) {     //passed through a cell center;
+                tryMoveInNewCell(newX, newY);
+            } else {
+                x = newX;
+                y = newY;
             }
-            setX(newX);
-            setY(newY);
         } else {
-            eat();
+            updateWhileStandingStill();
         }
+    }
+
+    public void tryMoveInNewCell(float newX, float newY) {
+        eat();
+        if(getScheduledDirection() != getDirection()    //direction change was scheduled
+           && tryChangeDirection()) {                   //and happened
+            return;
+        } else {
+            //Check for wall
+            float[] nextCell = direction.nextCell(newX, newY);
+            Location nextLocation = Game.getInstance().getMap().getLocation(nextCell);
+            if(nextLocation == Location.Wall) {
+                moving = false;
+                x = Math.round(newX);
+                y = Math.round(newY);
+            } else {
+                x = newX;
+                y = newY;
+            }
+        }
+    }
+
+    public void updateWhileStandingStill() {
+        eat();
     }
 
     public void eat(){
