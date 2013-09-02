@@ -4,6 +4,10 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class GameMap {
     private int width;
@@ -54,7 +58,7 @@ public class GameMap {
             if(c == '\n') {
                 if(x < getWidth() - 1)
                     for(; x < getWidth(); x++)
-                        getArray()[x][y] = Location.Space;
+                        getArray()[x][y] = Location.SPACE;
                 x = 0;
                 y++;
             } else {
@@ -64,6 +68,21 @@ public class GameMap {
             i = fis.read();
             c = (char) i;
         }
+    }
+
+    public Set<Map.Entry<Direction, int[]>> getFreeNeighbourCells(int x, int y) {
+        Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
+        Set<Map.Entry<Direction, int[]>> result = new HashSet<Map.Entry<Direction, int[]>>();
+        for(Direction d : directions) {
+            int[] c = d.nextCell(x, y);
+            if(getLocation(c) != Location.WALL)
+                result.add(new AbstractMap.SimpleEntry<Direction, int[]>(d, c));
+        }
+        return result;
+    }
+
+    public static double distance(int[] c1, int[] c2) {
+        return Math.sqrt((c1[0] - c2[0]) ^ 2 + (c1[1] - c2[1]) ^ 2 );
     }
 
     public int getWidth() {
@@ -90,11 +109,11 @@ public class GameMap {
         this.array = array;
     }
 
-    public Location getLocation(float[] cell) {
-        return getArray()[(int) cell[0]][(int) cell[1]];
+    public Location getLocation(int[] cell) {
+        return getArray()[cell[0]][cell[1]];
     }
 
-    public void setLocation(float[] cell, Location value) {
-        getArray()[(int) cell[0]][(int) cell[1]] = value;
+    public void setLocation(int[] cell, Location value) {
+        getArray()[cell[0]][cell[1]] = value;
     }
 }

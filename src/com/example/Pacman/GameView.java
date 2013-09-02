@@ -120,13 +120,13 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     continue;
                 }
                 switch(l) {
-                    case Wall:
+                    case WALL:
                         drawWall(c, i, j);
                         break;
-                    case Dot:
+                    case DOT:
                         drawDot(c, i, j);
                         break;
-                    case Energizer:
+                    case ENERGIZER:
                         drawEnergizer(c, i, j);
                         break;
                 }
@@ -145,14 +145,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         float[] sc = toScreenCoordinates(x, y);
-        c.drawCircle(sc[0], sc[1], getScreenRadius(Location.Dot), paint);
+        c.drawCircle(sc[0], sc[1], getScreenRadius(Location.DOT), paint);
     }
 
     public void drawEnergizer(Canvas c, float x, float y) {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         float[] sc = toScreenCoordinates(x, y);
-        c.drawCircle(sc[0], sc[1], getScreenRadius(Location.Energizer), paint);
+        c.drawCircle(sc[0], sc[1], getScreenRadius(Location.ENERGIZER), paint);
     }
 
     public void drawPacman(Canvas c) {

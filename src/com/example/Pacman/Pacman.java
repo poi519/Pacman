@@ -5,11 +5,8 @@ import android.util.Log;
 enum Direction {
     UP, DOWN, LEFT, RIGHT;
 
-    public float[] nextCell(float x, float y) {
-        float x_round = Math.round(x);
-        float y_round = Math.round(y);
-
-        float[] result = {x_round, y_round};
+    public int[] nextCell(int x, int y) {
+        int[] result = {x, y};
         switch(this) {
             case UP: result[1]--; break;
             case DOWN: result[1]++; break;
@@ -60,9 +57,9 @@ public class Pacman extends Movable implements HasRadius {
     }
 
     private boolean tryChangeDirection() {
-        float[] nextCell = getScheduledDirection().nextCell(getX(), getY());
+        int[] nextCell = getScheduledDirection().nextCell(Math.round(getX()), Math.round(getY()));
         Location nextLocation = Game.getInstance().getMap().getLocation(nextCell);
-        if(nextLocation == Location.Wall) {
+        if(nextLocation == Location.WALL) {
             Log.d("Pacman.tryChangeDirection", "Direction cannot be changed because there is wall in direction "
                     + getScheduledDirection());
             setScheduledDirection(getDirection());
@@ -83,8 +80,9 @@ public class Pacman extends Movable implements HasRadius {
             if(getDirection().isCollinear(newDirection))
                 setDirection(newDirection);
         } else {
-            Location nextLocation = Game.getInstance().getMap().getLocation(newDirection.nextCell(getX(), getY()));
-            if(nextLocation != Location.Wall) {
+            Location nextLocation = Game.getInstance().getMap().getLocation(
+                    newDirection.nextCell(Math.round(getX()), Math.round(getY())));
+            if(nextLocation != Location.WALL) {
                 setDirection(newDirection);
                 setMoving(true);
             }
@@ -92,16 +90,16 @@ public class Pacman extends Movable implements HasRadius {
     }
 
     @Override
-    public void tryMoveInNewCell(float newX, float newY) {
+    public void updateInNewCell(float newX, float newY) {
         eat();
         if(getScheduledDirection() != getDirection()    //direction change was scheduled
            && tryChangeDirection()) {                   //and happened
             //Do nothing
         } else {
             //Check for wall
-            float[] nextCell = getDirection().nextCell(newX, newY);
+            int[] nextCell = getDirection().nextCell(Math.round(newX), Math.round(newY));
             Location nextLocation = Game.getInstance().getMap().getLocation(nextCell);
-            if(nextLocation == Location.Wall) {
+            if(nextLocation == Location.WALL) {
                 setMoving(false);
                 setX(Math.round(newX));
                 setY(Math.round(newY));
@@ -118,13 +116,13 @@ public class Pacman extends Movable implements HasRadius {
     }
 
     public void eat(){
-        float[] coordinates = {Math.round(getX()), Math.round(getY())};
+        int[] coordinates = {Math.round(getX()), Math.round(getY())};
         GameMap map = Game.getInstance().getMap();
         Location location = map.getLocation(coordinates);
         switch(location){
-            case Dot:
-            case Energizer:
-                map.setLocation(coordinates, Location.Space);
+            case DOT:
+            case ENERGIZER:
+                map.setLocation(coordinates, Location.SPACE);
                 Game.getInstance().increaseScore(location.getScore());
         }
     }

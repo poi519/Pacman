@@ -4,7 +4,12 @@ public class Game {
     private Pacman pacman;
     private GameMap map;
     private long score;
+    private float refreshRate;
     private static final Game instance = new Game();
+
+    public float getRefreshRate() {
+        return refreshRate;
+    }
 
     public long getScore() {
         return score;
@@ -28,6 +33,7 @@ public class Game {
 
     private Game() {
         score = 0;
+        refreshRate = 60;
     }
 
     static public Game getInstance() {
@@ -35,8 +41,8 @@ public class Game {
     }
 
     public void loadMap(GameMap map) {
-        setMap(map);
-        setPacman(new Pacman(14, 23));
+        this.map = map;
+        this.pacman = new Pacman(14, 23);
     }
 
     public void increaseScore(int amount) {

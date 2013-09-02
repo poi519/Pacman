@@ -1,7 +1,7 @@
 package com.example.Pacman;
 
 abstract class Movable {
-    abstract void tryMoveInNewCell(float newX, float newY);
+    abstract void updateInNewCell(float newX, float newY);
     abstract void updateWhileStandingStill();
 
     private float x;
@@ -51,7 +51,7 @@ abstract class Movable {
     }
 
     final public void update() {
-        float dr = speed * 1f / 60f;
+        float dr = speed * 1f / Game.getInstance().getRefreshRate();
         float newX = x;
         float newY = y;
         if(moving) {
@@ -67,7 +67,7 @@ abstract class Movable {
             }
             if(((int) newX != (int) x
                     || (int) newY != (int) y)) {     //passed through a cell center;
-                tryMoveInNewCell(newX, newY);
+                updateInNewCell(newX, newY);
             } else {
                 x = newX;
                 y = newY;
