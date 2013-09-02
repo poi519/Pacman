@@ -5,7 +5,16 @@ public class Game {
     private GameMap map;
     private long score;
     private float refreshRate;
+    private Ghost[] ghosts;
     private static final Game instance = new Game();
+
+    public Ghost[] getGhosts() {
+        return ghosts;
+    }
+
+    public void setGhosts(Ghost[] ghosts) {
+        this.ghosts = ghosts;
+    }
 
     public float getRefreshRate() {
         return refreshRate;
@@ -43,9 +52,18 @@ public class Game {
     public void loadMap(GameMap map) {
         this.map = map;
         this.pacman = new Pacman(14, 23);
+        this.ghosts = new Ghost[1];
+        this.ghosts[0] = new Ghost("Blinky", new SimpleGhostStrategy(new RedGhostGoal()), 13, 11);
     }
 
     public void increaseScore(int amount) {
         score += amount;
+    }
+
+    public void update(){
+        pacman.update();
+        for(Ghost g : ghosts) {
+            g.update();
+        }
     }
 }

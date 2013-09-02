@@ -1,5 +1,7 @@
 package com.example.Pacman;
 
+import android.util.Log;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -35,15 +37,17 @@ class SimpleGhostStrategy implements GhostStrategy {
             Direction bestDirection = null;
             int[] goalCoordinates = goal.getCoordinates();
             double  currentDistance,
-                    bestDistance = 0;
+                    bestDistance = -1;
             for(Map.Entry<Direction, int[]> n : neighbours) {
                 currentDistance = GameMap.distance(n.getValue(), goalCoordinates);
+                Log.d("SimpleGhostStrategy.findBestDirection", "for direction " + n.getKey() +" currentDistance is " + currentDistance);
                 if(currentDistance <= bestDistance
-                        || bestDistance == 0) {
+                        || bestDistance < 0) {
                     bestDistance = currentDistance;
                     bestDirection = n.getKey();
                 }
             }
+            Log.d("SimpleGhostStrategy.findBestDirection", "Best Direction is " + bestDirection + " with dist. of " + bestDistance);
             return bestDirection;
         } else
             throw new GhostIsTrappedException();

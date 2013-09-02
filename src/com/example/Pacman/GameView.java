@@ -81,7 +81,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 try {
                     c = _surfaceHolder.lockCanvas(null);
                     synchronized (_surfaceHolder) {
-                        _panel.game.getPacman().update();
+                        _panel.game.update();
                         postInvalidate();
                     }
                 } finally {
@@ -101,6 +101,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void onDraw(Canvas canvas) {
         drawMap(canvas);
+        for(Ghost g : game.getGhosts()) {
+            drawGhost(g, canvas);
+        }
         drawPacman(canvas);
         drawScore(canvas);
     }
@@ -176,6 +179,13 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setTextSize(16);
         canvas.drawText("Your score: " + game.getScore(),
                 brx + 16, bry / 2, paint);
+    }
+
+    public void drawGhost(Ghost g, Canvas canvas) {
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        float[] screenCoordinates = toScreenCoordinates(g.getX(), g.getY());
+        canvas.drawCircle(screenCoordinates[0], screenCoordinates[1], getScreenRadius(g), paint);
     }
 
     @Override

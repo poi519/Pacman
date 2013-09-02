@@ -1,5 +1,7 @@
 package com.example.Pacman;
 
+import android.util.Log;
+
 enum GhostStatus {
     WAITING, CHASING
 }
@@ -14,10 +16,14 @@ public class Ghost extends Movable implements HasRadius {
         return 0.5f;
     }
 
-    public Ghost(String name, GhostStrategy strategy) {
+    public Ghost(String name, GhostStrategy strategy, int x, int y) {
         this.name = name;
         this.strategy = strategy;
+        this.setSpeed(2.0f);
         status = GhostStatus.WAITING;
+        this.setX(x);
+        this.setY(y);
+        Log.d("new Ghost", "Cordinates " + this.getX() + " " + this.getY());
     }
 
     @Override
@@ -27,6 +33,7 @@ public class Ghost extends Movable implements HasRadius {
         Direction newDirection;
         try {
             newDirection = strategy.findBestDirection(cellX, cellY);
+            Log.d("Ghost.updateInNewCell", "New direction is " + newDirection);
             if(newDirection == getDirection()) {
                 setX(newX);
                 setY(newY);
@@ -47,6 +54,7 @@ public class Ghost extends Movable implements HasRadius {
             if(waitTimeout <= 0)
                 status = GhostStatus.CHASING;
         } else {
+            setMoving(true);
             updateInNewCell(getX(), getY());
         }
     }
