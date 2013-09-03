@@ -53,7 +53,7 @@ public class Game {
         this.map = map;
         this.pacman = new Pacman(14, 23);
         this.ghosts = new Ghost[1];
-        this.ghosts[0] = new Ghost("Blinky", new SimpleGhostStrategy(new RedGhostGoal()), 13, 11);
+        this.ghosts[0] = new Ghost("Blinky", new AStarStrategy(new RedGhostGoal()), 13, 11);
     }
 
     public void increaseScore(int amount) {

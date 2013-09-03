@@ -70,11 +70,11 @@ class AStarStrategy implements GhostStrategy {
         this.goal = goal;
     }
 
-    private static Set<List<Integer>> getFreeNeighbourCells(int x, int y) {
+    private static Set<List<Integer>> getFreeNeighbourCells(List<Integer> cell) {
         Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
         Set<List<Integer>> result = new HashSet<List<Integer>>();
         for(Direction d : directions) {
-            int[] c = d.nextCell(x, y);
+            int[] c = d.nextCell(cell.get(0), cell.get(1));
             if(Game.getInstance().getMap().getLocation(c) != Location.WALL)
                 result.add(Arrays.asList(c[0], c[1]));
         }
@@ -86,8 +86,24 @@ class AStarStrategy implements GhostStrategy {
         return Arrays.asList(ar[0], ar[1]);
     }
 
-    private static int heuristicCostEstimate(List<Integer> start, List<Integer> finish) {
+    private static double heuristicCostEstimate(List<Integer> start, List<Integer> finish) {
         return Math.abs(finish.get(0) - start.get(0)) + Math.abs(finish.get(1) - start.get(1));
+    }
+
+    private static Direction findDirectionBetween(List<Integer> start, List<Integer> finish) {
+        int dx = finish.get(0) - start.get(0),
+            dy = finish.get(1) - start.get(1);
+        switch (dx) {
+            case 1 : return Direction.RIGHT;
+            case -1: return Direction.LEFT;
+            default:
+                switch (dy) {
+                    case 1 : return Direction.DOWN;
+                    case -1: return Direction.UP;
+                    default:
+                        return Direction.DOWN;
+                }
+        }
     }
 
     public Direction findBestDirection(int x, int y) throws GhostIsTrappedException {
@@ -97,13 +113,13 @@ class AStarStrategy implements GhostStrategy {
         openSet.add(start);
 
         Map<List<Integer>, List<Integer>> cameFrom = new HashMap<List<Integer>, List<Integer>>();
-        final Map<List<Integer>, Integer>   gScore = new HashMap<List<Integer>, Integer>(),
-                                            fScore = new HashMap<List<Integer>, Integer>();
-        gScore.put(start, 0);    // Cost from start along best known path.
-        // Estimated total cost from start to goal through y.
+        final Map<List<Integer>, Double>    gScore = new HashMap<List<Integer>, Double>(), // Cost from start along best known path.
+                                            fScore = new HashMap<List<Integer>, Double>(); // Estimated total cost from start to goal through y.
+        gScore.put(start, 0.0);    
         fScore.put(start, gScore.get(start) + heuristicCostEstimate(start, goalNode()));
 
         List<Integer> current;
+        double tentativeGScore;
         while(!openSet.isEmpty()) {
             current = Collections.min(openSet, new Comparator<List<Integer>>() {
                 @Override
@@ -112,32 +128,33 @@ class AStarStrategy implements GhostStrategy {
                 }
             }); //the node in openset having the lowest f_score[] value
             if(current.equals(goalNode()))
-                return reconstructPath(cameFrom, goalNode());
+                return findDirectionBetween(start, reconstructPath(cameFrom, goalNode()).get(1));//TODO optimize
 
-            remove current from openset
-            add current to closedset
-            for each neighbor in neighbor_nodes(current)
-                    tentative_g_score := g_score[current] + dist_between(current,neighbor)
-            if neighbor in closedset and tentative_g_score >= g_score[neighbor]
-            continue
+            openSet.remove(current);
+            closedSet.add(current);
 
-            if neighbor not in closedset or tentative_g_score < g_score[neighbor]
-            came_from[neighbor] := current
-            g_score[neighbor] := tentative_g_score
-            f_score[neighbor] := g_score[neighbor] + heuristic_cost_estimate(neighbor, goal)
-            if neighbor not in openset
-            add neighbor to openset
+            for(List<Integer> neighbour : getFreeNeighbourCells(current)) {
+                tentativeGScore = gScore.get(current) + 1;// special case of dist_between(current,neighbor);
+                if(closedSet.contains(neighbour) && tentativeGScore >= gScore.get(neighbour)) {
+                    continue;
+                } else {
+                    cameFrom.put(neighbour, current);
+                    gScore.put(neighbour, tentativeGScore);
+                    fScore.put(neighbour, gScore.get(neighbour) + heuristicCostEstimate(neighbour, goalNode()));
+                    if(!openSet.contains(neighbour))
+                        openSet.add(neighbour);
+                }
+            }
         }
         throw new GhostIsTrappedException();
     }
 
     private static List<List<Integer>> reconstructPath(Map<List<Integer>, List<Integer>> cameFrom,
                                                        List<Integer> currentNode) {
-        if(cameFrom.containsKey(currentNode)) {
-            List<List<Integer> p = reconstructPath(cameFrom, cameFrom.get(currentNode));
-            p.add(currentNode);
-            return p;
-        } else
-            return Arrays.asList(currentNode);
+        List<List<Integer>> p = cameFrom.containsKey(currentNode) ?
+                reconstructPath(cameFrom, cameFrom.get(currentNode)) :
+                new ArrayList<List<Integer>>();
+        p.add(currentNode);
+        return p;
     }
 }
