@@ -70,16 +70,7 @@ public class GameMap {
         }
     }
 
-    public Set<Map.Entry<Direction, int[]>> getFreeNeighbourCells(int x, int y) {
-        Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
-        Set<Map.Entry<Direction, int[]>> result = new HashSet<Map.Entry<Direction, int[]>>();
-        for(Direction d : directions) {
-            int[] c = d.nextCell(x, y);
-            if(getLocation(c) != Location.WALL)
-                result.add(new AbstractMap.SimpleEntry<Direction, int[]>(d, c));
-        }
-        return result;
-    }
+
 
     public static double distance(int[] c1, int[] c2) {
         return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2));
