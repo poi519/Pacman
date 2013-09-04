@@ -1,18 +1,21 @@
 package com.example.Pacman;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Game {
     private Pacman pacman;
     private GameMap map;
     private long score;
     private float refreshRate;
-    private Ghost[] ghosts;
+    private Map<String, Ghost> ghosts;
     private static final Game instance = new Game();
 
-    public Ghost[] getGhosts() {
+    public Map<String, Ghost> getGhosts() {
         return ghosts;
     }
 
-    public void setGhosts(Ghost[] ghosts) {
+    public void setGhosts(Map<String, Ghost> ghosts) {
         this.ghosts = ghosts;
     }
 
@@ -52,8 +55,9 @@ public class Game {
     public void loadMap(GameMap map) {
         this.map = map;
         this.pacman = new Pacman(14, 23);
-        this.ghosts = new Ghost[1];
-        this.ghosts[0] = new Ghost("Blinky", new AStarStrategy(new RedGhostGoal()), 13, 11);
+        this.ghosts = new HashMap<String, Ghost>();
+        this.ghosts.put("Blinky", new Ghost(new AStarStrategy(GhostGoals.RED), 15, 13));
+        this.ghosts.put("Pinky", new Ghost (new AStarStrategy(GhostGoals.PINK), 16, 13));
     }
 
     public void increaseScore(int amount) {
@@ -62,7 +66,7 @@ public class Game {
 
     public void update(){
         pacman.update();
-        for(Ghost g : ghosts) {
+        for(Ghost g : ghosts.values()) {
             g.update();
         }
     }

@@ -8,7 +8,6 @@ enum GhostStatus {
 
 public class Ghost extends Movable implements HasRadius {
     GhostStrategy strategy;
-    String name;
     GhostStatus status;
     float waitTimeout;
 
@@ -16,14 +15,12 @@ public class Ghost extends Movable implements HasRadius {
         return 0.5f;
     }
 
-    public Ghost(String name, GhostStrategy strategy, int x, int y) {
-        this.name = name;
+    public Ghost(GhostStrategy strategy, int x, int y) {
         this.strategy = strategy;
         this.setSpeed(2.0f);
         status = GhostStatus.WAITING;
         this.setX(x);
         this.setY(y);
-        Log.d("new Ghost", "Cordinates " + this.getX() + " " + this.getY());
     }
 
     @Override
