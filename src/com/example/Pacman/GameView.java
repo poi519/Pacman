@@ -186,6 +186,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setColor(Color.RED);
         else if(ghostName.equals("Pinky"))
             paint.setColor(0xFFFFC0CB);
+        else if (ghostName.equals("Inky"))
+            paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.FILL);
         Ghost g = game.getGhosts().get(ghostName);
         float[] screenCoordinates = toScreenCoordinates(g.getX(), g.getY());

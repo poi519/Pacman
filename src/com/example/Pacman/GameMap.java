@@ -4,10 +4,9 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.AbstractMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+class NoFreeCellsException extends Exception{}
 
 public class GameMap {
     private int width;
@@ -70,7 +69,59 @@ public class GameMap {
         }
     }
 
+    public boolean isFree(int[] cell) {
+        if(cell[0] >= width || cell[1] >= height || cell[0] < 0 || cell [1] < 0) {
+            return false;
+        } else {
+            Location l = getLocation(cell);
+            return !(l == Location.WALL || l == null);
+        }
+    }
 
+    public Set<List<Integer>> getFreeNeighbourCells(List<Integer> cell) {
+        Set<List<Integer>> result = new HashSet<List<Integer>>();
+        for(List<Integer> n : getAllNeighbourCells(cell)) {
+            int[] c = {n.get(0), n.get(1)};
+            if(isFree(c))
+                result.add(n);
+        }
+        return result;
+    }
+
+    public Set<List<Integer>> getAllNeighbourCells(List<Integer> cell) {
+        Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
+        Set<List<Integer>> result = new HashSet<List<Integer>>();
+        for(Direction d : directions) {
+            int[] c = d.nextCell(cell.get(0), cell.get(1));
+            result.add(Arrays.asList(c[0], c[1]));
+        }
+        return result;
+    }
+
+    public int[] getClosestFreeCell(int[] c) throws NoFreeCellsException {
+        List<Integer> cell = Arrays.asList(c[0], c[1]);
+        List<List<Integer>> pending = new ArrayList<List<Integer>>();
+        pending.addAll(getAllNeighbourCells(cell));
+
+        Set<List<Integer>> evaluated = new HashSet<List<Integer>>();
+        List<Integer> current;
+        while(!pending.isEmpty()) {
+            current = pending.get(0);
+            int[] currentArray = {current.get(0), current.get(1)};
+            if(isFree(currentArray)) {
+                return currentArray;
+            } else {
+                pending.remove(0);
+                evaluated.add(current);
+                for(List<Integer> n : getAllNeighbourCells(current)) {
+                    if(!evaluated.contains(n))
+                        pending.add(n);
+                }
+            }
+            //Log.d("GameMap.getClosestFreeCell", "Evaluated: " + evaluated.size() + " cells");
+        }
+        throw new NoFreeCellsException();
+    }
 
     public static double distance(int[] c1, int[] c2) {
         return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2));

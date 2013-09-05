@@ -18,12 +18,13 @@ abstract class AbstractAStarStrategy<Node> {
         Set<Node> closedSet = new HashSet<Node>(),
                 openSet = new HashSet<Node>();
         openSet.add(start);
+        Node goalNode = goalNode();
 
         Map<Node, Node> cameFrom = new HashMap<Node, Node>();
         final Map<Node, Double>    gScore = new HashMap<Node, Double>(), // Cost from start along best known path.
                 fScore = new HashMap<Node, Double>(); // Estimated total cost from start to goal through y.
         gScore.put(start, 0.0);
-        fScore.put(start, gScore.get(start) + heuristicCostEstimate(start, goalNode()));
+        fScore.put(start, gScore.get(start) + heuristicCostEstimate(start, goalNode));
 
         Node current;
         double tentativeGScore;
@@ -34,8 +35,8 @@ abstract class AbstractAStarStrategy<Node> {
                     return fScore.get(lhs).compareTo(fScore.get(rhs));
                 }
             }); //the node in openset having the lowest f_score[] value
-            if(current.equals(goalNode()))
-                return nextNode(cameFrom, goalNode());
+            if(current.equals(goalNode))
+                return nextNode(cameFrom, goalNode);
 
             openSet.remove(current);
             closedSet.add(current);
@@ -47,7 +48,7 @@ abstract class AbstractAStarStrategy<Node> {
                 } else {
                     cameFrom.put(neighbour, current);
                     gScore.put(neighbour, tentativeGScore);
-                    fScore.put(neighbour, gScore.get(neighbour) + heuristicCostEstimate(neighbour, goalNode()));
+                    fScore.put(neighbour, gScore.get(neighbour) + heuristicCostEstimate(neighbour, goalNode));
                     if(!openSet.contains(neighbour))
                         openSet.add(neighbour);
                 }
@@ -84,14 +85,7 @@ class AStarStrategy extends AbstractAStarStrategy<List<Integer>> implements Ghos
 
     @Override
     Set<List<Integer>> getNeighbourNodes(List<Integer> cell) {
-        Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
-        Set<List<Integer>> result = new HashSet<List<Integer>>();
-        for(Direction d : directions) {
-            int[] c = d.nextCell(cell.get(0), cell.get(1));
-            if(Game.getInstance().getMap().getLocation(c) != Location.WALL)
-                result.add(Arrays.asList(c[0], c[1]));
-        }
-        return result;
+        return Game.getInstance().getMap().getFreeNeighbourCells(cell);
     }
 
     @Override

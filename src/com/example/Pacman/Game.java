@@ -54,10 +54,11 @@ public class Game {
 
     public void loadMap(GameMap map) {
         this.map = map;
-        this.pacman = new Pacman(14, 23);
-        this.ghosts = new HashMap<String, Ghost>();
-        this.ghosts.put("Blinky", new Ghost(new AStarStrategy(GhostGoals.RED), 15, 13));
-        this.ghosts.put("Pinky", new Ghost (new AStarStrategy(GhostGoals.PINK), 16, 13));
+        pacman = new Pacman(14, 23);
+        ghosts = new HashMap<String, Ghost>();
+        ghosts.put("Blinky", new Ghost(new AStarStrategy(GhostGoals.RED), 11, 13));
+        //ghosts.put("Pinky", new Ghost (new AStarStrategy(GhostGoals.PINK), 12, 13));
+        ghosts.put("Inky", new Ghost (new AStarStrategy(GhostGoals.BLUE), 13, 13));
     }
 
     public void increaseScore(int amount) {
