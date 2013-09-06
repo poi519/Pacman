@@ -1,11 +1,18 @@
 package com.example.Pacman;
 
 abstract class Movable {
-    abstract void updateInNewCell(float newX, float newY);
+    abstract void updateInNewCell(Float2 newCoordinates);
     abstract void updateWhileStandingStill();
 
-    private float x;
-    private float y;
+    Float2 getCoordinates() {
+        return coordinates;
+    }
+
+    void setCoordinates(Float2 coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    private Float2 coordinates;
     private Direction direction;
     private float speed;
     private boolean moving;
@@ -16,22 +23,6 @@ abstract class Movable {
 
     public void setMoving(boolean moving) {
         this.moving = moving;
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public void setX(float x) {
-        this.x = x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public void setY(float y) {
-        this.y = y;
     }
 
     public Direction getDirection() {
@@ -52,25 +43,23 @@ abstract class Movable {
 
     final public void update() {
         float dr = speed * 1f / Game.getInstance().getRefreshRate();
-        float newX = x;
-        float newY = y;
+        Float2 newCoordinates = new Float2(coordinates);
         if(moving) {
             switch(direction) {
                 case UP:
-                    newY = y - dr; break;
+                    newCoordinates.y -= dr; break;
                 case DOWN:
-                    newY = y + dr; break;
+                    newCoordinates.y += dr; break;
                 case LEFT:
-                    newX = x - dr; break;
+                    newCoordinates.x -= dr; break;
                 case RIGHT:
-                    newX = x + dr; break;
+                    newCoordinates.x += dr; break;
             }
-            if(((int) newX != (int) x
-                    || (int) newY != (int) y)) {     //passed through a cell center;
-                updateInNewCell(newX, newY);
+            if(((int) newCoordinates.x != (int) coordinates.x
+                || (int) newCoordinates.y != (int) coordinates.y)) {     //passed through a cell center;
+                updateInNewCell(newCoordinates);
             } else {
-                x = newX;
-                y = newY;
+                coordinates = newCoordinates;
             }
         } else {
             updateWhileStandingStill();

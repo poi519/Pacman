@@ -6,7 +6,7 @@ class GhostIsTrappedException extends Exception {}
 class AStarFailureException extends Exception {}
 
 public interface GhostStrategy {
-    public Direction findBestDirection(int x, int y) throws GhostIsTrappedException;
+    public Direction findBestDirection(Int2 cell) throws GhostIsTrappedException;
 }
 
 abstract class AbstractAStarStrategy<Node> {
@@ -76,7 +76,9 @@ abstract class AbstractAStarStrategy<Node> {
     }
 }
 
-class AStarStrategy extends AbstractAStarStrategy<List<Integer>> implements GhostStrategy {
+class CellsAreNotAdjacentException extends Exception {}
+
+class AStarStrategy extends AbstractAStarStrategy<Int2> implements GhostStrategy {
     private Goal goal;
 
     public AStarStrategy(Goal goal) {
@@ -84,24 +86,23 @@ class AStarStrategy extends AbstractAStarStrategy<List<Integer>> implements Ghos
     }
 
     @Override
-    Set<List<Integer>> getNeighbourNodes(List<Integer> cell) {
+    Set<Int2> getNeighbourNodes(Int2 cell) {
         return Game.getInstance().getMap().getFreeNeighbourCells(cell);
     }
 
     @Override
-    List<Integer> goalNode() {
-        int[] ar = goal.getCoordinates();
-        return Arrays.asList(ar[0], ar[1]);
+    Int2 goalNode() {
+        return goal.getCoordinates();
     }
 
     @Override
-    double heuristicCostEstimate(List<Integer> start, List<Integer> finish) {
-        return Math.abs(finish.get(0) - start.get(0)) + Math.abs(finish.get(1) - start.get(1));
+    double heuristicCostEstimate(Int2 start, Int2 finish) {
+        return Math.abs(finish.x - start.x) + Math.abs(finish.y - start.y);
     }
 
-    private static Direction findDirectionBetween(List<Integer> start, List<Integer> finish) {
-        int dx = finish.get(0) - start.get(0),
-            dy = finish.get(1) - start.get(1);
+    private static Direction findDirectionBetween(Int2 start, Int2 finish) throws CellsAreNotAdjacentException {
+        int dx = finish.x - start.x,
+            dy = finish.y - start.y;
         switch (dx) {
             case 1 : return Direction.RIGHT;
             case -1: return Direction.LEFT;
@@ -110,16 +111,18 @@ class AStarStrategy extends AbstractAStarStrategy<List<Integer>> implements Ghos
                     case 1 : return Direction.DOWN;
                     case -1: return Direction.UP;
                     default:
-                        return Direction.DOWN;
+                        throw new CellsAreNotAdjacentException();
                 }
         }
     }
 
-    public Direction findBestDirection(int x, int y) throws GhostIsTrappedException {
+    public Direction findBestDirection(Int2 start) throws GhostIsTrappedException {
         try {
-            List<Integer> start = Arrays.asList(x, y);
             return findDirectionBetween(start, findBestNextNode(start));
         } catch (AStarFailureException e) {
+            e.printStackTrace();
+            throw new GhostIsTrappedException();
+        } catch (CellsAreNotAdjacentException e) {
             e.printStackTrace();
             throw new GhostIsTrappedException();
         }

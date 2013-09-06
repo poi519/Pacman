@@ -2,36 +2,6 @@ package com.example.Pacman;
 
 import android.util.Log;
 
-enum Direction {
-    UP, DOWN, LEFT, RIGHT;
-
-    public int[] nextCell(int x, int y) {
-        int[] result = {x, y};
-        switch(this) {
-            case UP: result[1]--; break;
-            case DOWN: result[1]++; break;
-            case LEFT: result[0]--; break;
-            case RIGHT: result[0]++; break;
-        }
-        return result;
-    }
-
-    public boolean isHorizontal() {
-        switch(this) {
-            case LEFT:
-            case RIGHT:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public boolean isCollinear(Direction other) {
-        return (this.isHorizontal() == other.isHorizontal());
-    }
-
-}
-
 public class Pacman extends Movable implements HasRadius {
     private Direction scheduledDirection;
 

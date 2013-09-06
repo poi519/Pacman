@@ -69,8 +69,8 @@ public class GameMap {
         }
     }
 
-    public boolean isFree(int[] cell) {
-        if(cell[0] >= width || cell[1] >= height || cell[0] < 0 || cell [1] < 0) {
+    public boolean isFree(Int2 cell) {
+        if(cell.x >= width || cell.y >= height || cell.x < 0 || cell .y < 0) {
             return false;
         } else {
             Location l = getLocation(cell);
@@ -78,42 +78,39 @@ public class GameMap {
         }
     }
 
-    public Set<List<Integer>> getFreeNeighbourCells(List<Integer> cell) {
-        Set<List<Integer>> result = new HashSet<List<Integer>>();
-        for(List<Integer> n : getAllNeighbourCells(cell)) {
-            int[] c = {n.get(0), n.get(1)};
-            if(isFree(c))
+    public Set<Int2> getFreeNeighbourCells(Int2 cell) {
+        Set<Int2> result = new HashSet<Int2>();
+        for(Int2 n : getAllNeighbourCells(cell)) {
+            if(isFree(n))
                 result.add(n);
         }
         return result;
     }
 
-    public Set<List<Integer>> getAllNeighbourCells(List<Integer> cell) {
+    public Set<Int2> getAllNeighbourCells(Int2 cell) {
         Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
-        Set<List<Integer>> result = new HashSet<List<Integer>>();
+        Set<Int2> result = new HashSet<Int2>();
         for(Direction d : directions) {
-            int[] c = d.nextCell(cell.get(0), cell.get(1));
-            result.add(Arrays.asList(c[0], c[1]));
+            Int2 c = d.nextCell(cell);
+            result.add(c);
         }
         return result;
     }
 
-    public int[] getClosestFreeCell(int[] c) throws NoFreeCellsException {
-        List<Integer> cell = Arrays.asList(c[0], c[1]);
-        List<List<Integer>> pending = new ArrayList<List<Integer>>();
+    public Int2 getClosestFreeCell(Int2 cell) throws NoFreeCellsException {
+        List<Int2> pending = new ArrayList<Int2>();
         pending.addAll(getAllNeighbourCells(cell));
 
-        Set<List<Integer>> evaluated = new HashSet<List<Integer>>();
-        List<Integer> current;
+        Set<Int2> evaluated = new HashSet<Int2>();
+        Int2 current;
         while(!pending.isEmpty()) {
             current = pending.get(0);
-            int[] currentArray = {current.get(0), current.get(1)};
-            if(isFree(currentArray)) {
-                return currentArray;
+            if(isFree(current)) {
+                return current;
             } else {
                 pending.remove(0);
                 evaluated.add(current);
-                for(List<Integer> n : getAllNeighbourCells(current)) {
+                for(Int2 n : getAllNeighbourCells(current)) {
                     if(!evaluated.contains(n))
                         pending.add(n);
                 }
@@ -123,8 +120,8 @@ public class GameMap {
         throw new NoFreeCellsException();
     }
 
-    public static double distance(int[] c1, int[] c2) {
-        return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2));
+    public static double distance(Int2 c1, Int2 c2) {
+        return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
     }
 
     public int getWidth() {
@@ -150,12 +147,12 @@ public class GameMap {
     public void setArray(Location[][] array) {
         this.array = array;
     }
-
-    public Location getLocation(int[] cell) {
-        return getArray()[cell[0]][cell[1]];
+    //TODO add out of bounds checks
+    public Location getLocation(Int2 cell) {
+        return getArray()[cell.x][cell.y];
     }
 
-    public void setLocation(int[] cell, Location value) {
-        getArray()[cell[0]][cell[1]] = value;
+    public void setLocation(Int2 cell, Location value) {
+        getArray()[cell.x][cell.y] = value;
     }
 }

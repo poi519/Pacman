@@ -2,32 +2,26 @@ package com.example.Pacman;
 
 import android.util.Log;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
 interface Goal {
-    public int[] getCoordinates();
+    public Int2 getCoordinates();
 }
 
 class GhostGoals {
     final public static Goal RED = new Goal(){
-        public int[] getCoordinates() {
-            Pacman pacman = Game.getInstance().getPacman();
-            int[] result = {Math.round(pacman.getX()), Math.round(pacman.getY())};
-            return result;
+        public Int2 getCoordinates() {
+            return Game.getInstance().getPacman().getCoordinates().toInt2();
         }
     };
 
     final public static Goal PINK = new Goal() {
-        public int[] getCoordinates() {
+        public Int2 getCoordinates() {
             Pacman pacman = Game.getInstance().getPacman();
             Direction dir = pacman.getDirection();
             GameMap map = Game.getInstance().getMap();
-            int[] result = {Math.round(pacman.getX()), Math.round(pacman.getY())};
-            int[] nextCell;
+            Int2 result = pacman.getCoordinates().toInt2();
+            Int2 nextCell;
             for(int i = 0; i < 4; i++) {
-                nextCell = dir.nextCell(result[0], result[1]);
+                nextCell = dir.nextCell(result);
                 if(map.getLocation(nextCell) == Location.WALL) {
                     break;
                 } else {
@@ -39,23 +33,23 @@ class GhostGoals {
     };
 
     final public static Goal BLUE = new Goal() {
-        public int[] getCoordinates() {
+        public Int2 getCoordinates() {
             Pacman pacman = Game.getInstance().getPacman();
             Ghost blinky = Game.getInstance().getGhosts().get("Blinky");
-            int[] endA = {Math.round(blinky.getX()), Math.round(blinky.getY())};
+            Int2 endA = blinky.getCoordinates().toInt2();
 
-            int[] center = {Math.round(pacman.getX()), Math.round(pacman.getY())};
+            Int2 center = pacman.getCoordinates().toInt2();
             for(int i = 0; i < 2; i++) {
-                center = pacman.getDirection().nextCell(center[0], center[1]);
+                center = pacman.getDirection().nextCell(center);
             }
 
-            int[] endB = {2 * center[0] - endA[0], 2 * center[1] - endA[0]};
+            Int2 endB = new Int2(2 * center.x - endA.x, 2 * center.y - endA.y);
             GameMap m = Game.getInstance().getMap();
 
-            if(endB[0] < 0) endB[0] = 0;
-            if(endB[0] >= m.getWidth()) endB[0] = m.getWidth();
-            if(endB[1] < 0) endB[1] = 0;
-            if(endB[1] >= m.getHeight()) endB[1] = m.getHeight();
+            if(endB.x < 0) endB.x = 0;
+            if(endB.x >= m.getWidth()) endB.x = m.getWidth() - 1;
+            if(endB.y < 0) endB.y = 0;
+            if(endB.y >= m.getHeight()) endB.y = m.getHeight() - 1;
 
             if(!m.isFree(endB)) {
                 try {

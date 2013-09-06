@@ -15,29 +15,26 @@ public class Ghost extends Movable implements HasRadius {
         return 0.5f;
     }
 
-    public Ghost(GhostStrategy strategy, int x, int y) {
+    public Ghost(GhostStrategy strategy, Int2 coordinates) {
         this.strategy = strategy;
-        this.setSpeed(2.0f);
+        setSpeed(2.0f);
         status = GhostStatus.WAITING;
-        this.setX(x);
-        this.setY(y);
+        waitTimeout = 5;
+        this.setCoordinates(coordinates.toFloat2());
     }
 
     @Override
-    void updateInNewCell(float newX, float newY) {
-        int cellX = Math.round(newX);
-        int cellY = Math.round(newY);
+    void updateInNewCell(Float2 newCoordinates) {
+        Int2 newCell = newCoordinates.toInt2();
         Direction newDirection;
         try {
-            newDirection = strategy.findBestDirection(cellX, cellY);
+            newDirection = strategy.findBestDirection(newCell);
             Log.d("Ghost.updateInNewCell", "New direction is " + newDirection);
             if(newDirection == getDirection()) {
-                setX(newX);
-                setY(newY);
+                setCoordinates(newCoordinates);
             } else {
                 setDirection(newDirection);
-                setX(cellX);
-                setY(cellY);
+                setCoordinates(newCell.toFloat2());
             }
         } catch(GhostIsTrappedException e) {
             e.printStackTrace();
@@ -52,7 +49,7 @@ public class Ghost extends Movable implements HasRadius {
                 status = GhostStatus.CHASING;
         } else {
             setMoving(true);
-            updateInNewCell(getX(), getY());
+            updateInNewCell(getCoordinates());
         }
     }
 }
