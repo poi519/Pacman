@@ -35,6 +35,11 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return res;
     }
 
+    public Float2 toScreenCoordinates(Float2 coordinates) {
+        float[] a = toScreenCoordinates(coordinates.x, coordinates.y);
+        return new Float2(a[0], a[1]);
+    }
+
     public float toAngle(Direction dir) {
         switch(dir) {
             case RIGHT: return 0;
@@ -163,10 +168,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStyle(Paint.Style.FILL);
 
         Pacman pacman = game.getPacman();
-        float[] screentl = toScreenCoordinates(pacman.getX() - 0.5f, pacman.getY() - 0.5f);
-        float[] screenbr = toScreenCoordinates(pacman.getX() + 0.5f, pacman.getY() + 0.5f);
+        float[] screentl = toScreenCoordinates(pacman.getCoordinates().x - 0.5f, pacman.getCoordinates().y - 0.5f);
+        float[] screenbr = toScreenCoordinates(pacman.getCoordinates().x + 0.5f, pacman.getCoordinates().y + 0.5f);
         float zeroAngle = toAngle(pacman.getDirection());
-        float coordinate = pacman.getDirection().isHorizontal() ? pacman.getX() : pacman.getY();
+        float coordinate = pacman.getDirection().isHorizontal() ? pacman.getCoordinates().x : pacman.getCoordinates().y;
         float mouthAngle = (float) Math.abs(90 * Math.sin(Math.PI * (coordinate - (int) coordinate)));//YEAH!
         c.drawArc(new RectF(screentl[0], screentl[1], screenbr[0], screenbr[1]),
                 zeroAngle + mouthAngle / 2,
@@ -190,8 +195,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.FILL);
         Ghost g = game.getGhosts().get(ghostName);
-        float[] screenCoordinates = toScreenCoordinates(g.getX(), g.getY());
-        canvas.drawCircle(screenCoordinates[0], screenCoordinates[1], getScreenRadius(g), paint);
+        Float2 screenCoordinates = toScreenCoordinates(g.getCoordinates());
+        canvas.drawCircle(screenCoordinates.x, screenCoordinates.y, getScreenRadius(g), paint);
     }
 
     @Override
