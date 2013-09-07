@@ -100,25 +100,9 @@ class AStarStrategy extends AbstractAStarStrategy<Int2> implements GhostStrategy
         return Math.abs(finish.x - start.x) + Math.abs(finish.y - start.y);
     }
 
-    private static Direction findDirectionBetween(Int2 start, Int2 finish) throws CellsAreNotAdjacentException {
-        int dx = finish.x - start.x,
-            dy = finish.y - start.y;
-        switch (dx) {
-            case 1 : return Direction.RIGHT;
-            case -1: return Direction.LEFT;
-            default:
-                switch (dy) {
-                    case 1 : return Direction.DOWN;
-                    case -1: return Direction.UP;
-                    default:
-                        throw new CellsAreNotAdjacentException();
-                }
-        }
-    }
-
     public Direction findBestDirection(Int2 start) throws GhostIsTrappedException {
         try {
-            return findDirectionBetween(start, findBestNextNode(start));
+            return GameMap.findDirectionBetween(start, findBestNextNode(start));
         } catch (AStarFailureException e) {
             e.printStackTrace();
             throw new GhostIsTrappedException();

@@ -1,10 +1,14 @@
 package com.example.Pacman;
 
 import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 class NoFreeCellsException extends Exception{}
 
@@ -31,7 +35,9 @@ public class GameMap {
         } finally {
             try {
                 if(fis != null) fis.close();
-            } catch(IOException e) {}
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
         }
         return map;
     }
@@ -118,6 +124,22 @@ public class GameMap {
             //Log.d("GameMap.getClosestFreeCell", "Evaluated: " + evaluated.size() + " cells");
         }
         throw new NoFreeCellsException();
+    }
+
+    public static Direction findDirectionBetween(Int2 start, Int2 finish) throws CellsAreNotAdjacentException {
+        int dx = finish.x - start.x,
+                dy = finish.y - start.y;
+        switch (dx) {
+            case 1 : return Direction.RIGHT;
+            case -1: return Direction.LEFT;
+            default:
+                switch (dy) {
+                    case 1 : return Direction.DOWN;
+                    case -1: return Direction.UP;
+                    default:
+                        throw new CellsAreNotAdjacentException();
+                }
+        }
     }
 
     public static double distance(Int2 c1, Int2 c2) {
