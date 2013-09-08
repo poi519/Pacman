@@ -1,19 +1,19 @@
 package com.example.Pacman;
 
-import android.util.Log;
-
 interface Goal {
     public Int2 getCoordinates();
 }
 
 class GhostGoals {
     final public static Goal RED = new Goal(){
+        @Override
         public Int2 getCoordinates() {
             return Game.getInstance().getPacman().getCoordinates().toInt2();
         }
     };
 
     final public static Goal PINK = new Goal() {
+        @Override
         public Int2 getCoordinates() {
             Pacman pacman = Game.getInstance().getPacman();
             Direction dir = pacman.getDirection();
@@ -33,6 +33,7 @@ class GhostGoals {
     };
 
     final public static Goal BLUE = new Goal() {
+        @Override
         public Int2 getCoordinates() {
             Pacman pacman = Game.getInstance().getPacman();
             Ghost blinky = Game.getInstance().getGhosts().get("Blinky");
@@ -52,15 +53,24 @@ class GhostGoals {
             if(endB.y >= m.getHeight()) endB.y = m.getHeight() - 1;
 
             if(!m.isFree(endB)) {
-                try {
-                    endB = m.getClosestFreeCell(endB);
-                } catch(NoFreeCellsException e) {
-                    e.printStackTrace();
-                }
+                endB = m.getClosestFreeCell(endB);
             }
             //Log.d("BLUE GHOST GOAL", "is " + endB[0] + " " + endB[1]);
             return endB;
         }
     };
 
+    final public static Goal ORANGE = new Goal() {
+        @Override
+        public Int2 getCoordinates() {
+            Float2 pacmanCoordinates = Game.getInstance().getPacman().getCoordinates();
+            Float2 clydeCoordinates = Game.getInstance().getGhosts().get("Clyde").getCoordinates();
+            if(GameMap.distance(pacmanCoordinates, clydeCoordinates) > 9)
+                return pacmanCoordinates.toInt2();
+            else {
+                GameMap map = Game.getInstance().getMap();
+                return map.getClosestFreeCell(new Int2(map.getWidth() - 1, map.getHeight() - 1));
+            }
+        }
+    };
 }

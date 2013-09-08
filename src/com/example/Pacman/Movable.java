@@ -42,7 +42,7 @@ abstract class Movable {
     }
 
     final public void update() {
-        float dr = speed * 1f / Game.getInstance().getRefreshRate();
+        float dr = speed * 1f / Game.getInstance().REFRESH_RATE;
         Float2 newCoordinates = new Float2(coordinates);
         if(moving) {
             switch(direction) {

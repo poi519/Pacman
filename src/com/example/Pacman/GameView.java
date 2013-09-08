@@ -104,6 +104,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
         drawPacman(canvas);
         drawScore(canvas);
+        drawLives(canvas);
     }
 
     public void drawMap(Canvas c) {
@@ -180,6 +181,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 brx + 16, bry / 2, paint);
     }
 
+    public void drawLives(Canvas canvas) {
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setTextSize(16);
+        canvas.drawText("Your lives: " + game.getLives(),
+                brx + 16, bry / 2 + 32, paint);
+    }
+
     public void drawGhost(String ghostName, Canvas canvas) {
         if(ghostName.equals("Blinky"))
             paint.setColor(Color.RED);
@@ -187,6 +196,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setColor(0xFFFFC0CB);
         else if (ghostName.equals("Inky"))
             paint.setColor(Color.BLUE);
+        else
+            paint.setColor(0xFFFF5500);
         paint.setStyle(Paint.Style.FILL);
         Ghost g = game.getGhosts().get(ghostName);
         Int2 screenCoordinates = toScreenCoordinates(g.getCoordinates());

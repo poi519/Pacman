@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 enum GhostStatus {
-    WAITING, CHASING
+    WAITING, CHASING, FLEEING
 }
 
 public class Ghost extends Movable implements HasRadius {
@@ -18,9 +18,18 @@ public class Ghost extends Movable implements HasRadius {
         return 0.5f;
     }
 
+    static Ghost makeGhost(String name, Int2 position) {
+        GhostStrategy strategy;
+        if(name.equals("Blinky")) strategy = new AStarStrategy(GhostGoals.RED);
+        else if(name.equals("Pinky")) strategy = new AStarStrategy(GhostGoals.PINK);
+        else if(name.equals("Inky")) strategy = new AStarStrategy(GhostGoals.BLUE);
+        else strategy = new AStarStrategy(GhostGoals.ORANGE);
+        return new Ghost(strategy, position);
+    }
+
     public Ghost(GhostStrategy strategy, Int2 coordinates) {
         this.strategy = strategy;
-        setSpeed(2.0f);
+        setSpeed(1.8f);
         status = GhostStatus.WAITING;
         waitTimeout = 5;
         this.setCoordinates(coordinates.toFloat2());
@@ -70,7 +79,7 @@ public class Ghost extends Movable implements HasRadius {
     @Override
     void updateWhileStandingStill() {
         if(status == GhostStatus.WAITING) {
-            waitTimeout -= 1f / Game.getInstance().getRefreshRate();
+            waitTimeout -= 1f / Game.getInstance().REFRESH_RATE;
             if(waitTimeout <= 0)
                 status = GhostStatus.CHASING;
         } else {

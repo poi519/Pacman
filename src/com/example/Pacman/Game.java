@@ -7,9 +7,19 @@ public class Game {
     private Pacman pacman;
     private GameMap map;
     private long score;
-    private float refreshRate;
+    public final float REFRESH_RATE;
     private Map<String, Ghost> ghosts;
     private static final Game instance = new Game();
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    private int lives;
 
     public Map<String, Ghost> getGhosts() {
         return ghosts;
@@ -17,10 +27,6 @@ public class Game {
 
     public void setGhosts(Map<String, Ghost> ghosts) {
         this.ghosts = ghosts;
-    }
-
-    public float getRefreshRate() {
-        return refreshRate;
     }
 
     public long getScore() {
@@ -44,21 +50,38 @@ public class Game {
     }
 
     private Game() {
-        score = 0;
-        refreshRate = 60;
+        ghosts = new HashMap<String, Ghost>();
+        REFRESH_RATE = 60;
+        setupNewGame();
     }
 
     static public Game getInstance() {
         return Game.instance;
     }
 
+    public void setupNewGame() {
+        score = 0;
+        ghosts.clear();
+        lives = 3;
+    }
+
+
     public void loadMap(GameMap map) {
         this.map = map;
-        pacman = new Pacman(new Int2(14, 23));
-        ghosts = new HashMap<String, Ghost>();
-        ghosts.put("Blinky", new Ghost(new AStarStrategy(GhostGoals.RED), new Int2(11, 13)));
-        //ghosts.put("Pinky", new Ghost (new AStarStrategy(GhostGoals.PINK), new Int2(12, 13)));
-        ghosts.put("Inky", new Ghost (new AStarStrategy(GhostGoals.BLUE), new Int2(13, 13)));
+        goToInitialPositions();
+    }
+
+    public void goToInitialPositions() {
+        ghosts.clear();
+        Int2 position;
+        for(String name : map.getInitialPositions().keySet()){
+            position = map.getInitialPositions().get(name);
+            if(name.equals("Pacman")) {
+                this.pacman = new Pacman(position);
+            } else {
+                ghosts.put(name, Ghost.makeGhost(name, position));
+            }
+        }
     }
 
     public void increaseScore(int amount) {
@@ -69,6 +92,14 @@ public class Game {
         pacman.update();
         for(Ghost g : ghosts.values()) {
             g.update();
+            if(g.status != GhostStatus.FLEEING
+                && GameMap.distance(g.getCoordinates(),
+                    pacman.getCoordinates()) < (g.getRadius() + pacman.getRadius())) {
+                //Pacman's caught
+                lives--;
+                goToInitialPositions();
+                break;
+            }
         }
     }
 }

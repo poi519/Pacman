@@ -5,23 +5,27 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-class NoFreeCellsException extends Exception{}
+import java.util.*;
 
 public class GameMap {
     private int width;
     private int height;
-
+    private Map<String, Int2> initialPositions;
     private Location[][] array;
 
+    public Map<String, Int2> getInitialPositions() {
+        return initialPositions;
+    }
+
+    public void setInitialPositions(Map<String, Int2> initialPositions) {
+        this.initialPositions = initialPositions;
+    }
+
     public GameMap(int width, int height) {
-        this.setWidth(width);
-        this.setHeight(height);
-        setArray(new Location[width][height]);
+        this.width = width;
+        this.height = height;
+        array = new Location[width][height];
+        initialPositions = new HashMap<String, Int2>();
     }
 
     static GameMap loadInputStream(InputStream fis) {
@@ -29,6 +33,8 @@ public class GameMap {
         try {
             map = GameMap.fromDimensionsInStream(fis);
             Log.d("GameMap.loadFile", "Map dimensions are" + map.getWidth() + " " + map.getHeight());
+            for(int i = 0; i < 5; i++)
+                map.readInitialPositionFromStream(fis);
             map.readArrayFromStream(fis);
         } catch(IOException e) {
             map = new GameMap(10, 10);
@@ -52,6 +58,19 @@ public class GameMap {
         }
         String[] dimStrings = bais.toString().split(" ");
         return new GameMap(Integer.parseInt(dimStrings[0]), Integer.parseInt(dimStrings[1]));
+    }
+
+    private void readInitialPositionFromStream(InputStream fis) throws IOException {
+        int i = fis.read();
+        ByteArrayOutputStream bais = new ByteArrayOutputStream();
+        while((char) i != '\n') {
+            Log.d("fromDimensionsInStream", Character.toString((char) i));
+            bais.write(i);
+            i = fis.read();
+        }
+        String[] dimStrings = bais.toString().split(" ");
+        initialPositions.put(dimStrings[0],
+                new Int2(Integer.parseInt(dimStrings[1]), Integer.parseInt(dimStrings[2])));
     }
 
     private void readArrayFromStream(InputStream fis) throws IOException {
@@ -103,7 +122,7 @@ public class GameMap {
         return result;
     }
 
-    public Int2 getClosestFreeCell(Int2 cell) throws NoFreeCellsException {
+    public Int2 getClosestFreeCell(Int2 cell) {
         List<Int2> pending = new ArrayList<Int2>();
         pending.addAll(getAllNeighbourCells(cell));
 
@@ -123,12 +142,12 @@ public class GameMap {
             }
             //Log.d("GameMap.getClosestFreeCell", "Evaluated: " + evaluated.size() + " cells");
         }
-        throw new NoFreeCellsException();
+        return cell;
     }
 
     public static Direction findDirectionBetween(Int2 start, Int2 finish) throws CellsAreNotAdjacentException {
         int dx = finish.x - start.x,
-                dy = finish.y - start.y;
+            dy = finish.y - start.y;
         switch (dx) {
             case 1 : return Direction.RIGHT;
             case -1: return Direction.LEFT;
@@ -143,6 +162,10 @@ public class GameMap {
     }
 
     public static double distance(Int2 c1, Int2 c2) {
+        return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
+    }
+
+    public static double distance(Float2 c1, Float2 c2) {
         return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
     }
 
