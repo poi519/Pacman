@@ -20,10 +20,10 @@ public class Ghost extends Movable implements HasRadius {
 
     static Ghost makeGhost(String name, Int2 position) {
         GhostStrategy strategy;
-        if(name.equals("Blinky")) strategy = new AStarStrategy(GhostGoals.RED);
-        else if(name.equals("Pinky")) strategy = new AStarStrategy(GhostGoals.PINK);
-        else if(name.equals("Inky")) strategy = new AStarStrategy(GhostGoals.BLUE);
-        else strategy = new AStarStrategy(GhostGoals.ORANGE);
+        if(name.equals("Blinky")) strategy = new AStarStrategy(GhostChasingGoals.RED);
+        else if(name.equals("Pinky")) strategy = new AStarStrategy(GhostChasingGoals.PINK);
+        else if(name.equals("Inky")) strategy = new AStarStrategy(GhostChasingGoals.BLUE);
+        else strategy = new AStarStrategy(GhostChasingGoals.ORANGE);
         return new Ghost(strategy, position);
     }
 

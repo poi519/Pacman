@@ -112,3 +112,28 @@ class AStarStrategy extends AbstractAStarStrategy<Int2> implements GhostStrategy
         }
     }
 }
+
+class SimpleStrategy implements GhostStrategy {
+    private Goal goal;
+
+    public SimpleStrategy(Goal goal) {
+        this.goal = goal;
+    }
+
+    public Direction findBestDirection(Int2 start) throws GhostIsTrappedException {
+        final Int2 goalCell = goal.getCoordinates();
+        GameMap map = Game.getInstance().getMap();
+        Int2 nextCell = Collections.min(map.getFreeNeighbourCells(start), new Comparator<Int2>() {
+            @Override
+            public int compare(Int2 lhs, Int2 rhs) {
+                return (int) Math.signum(GameMap.distance(lhs, goalCell) - GameMap.distance(rhs, goalCell));
+            }
+        });
+        try {
+            return GameMap.findDirectionBetween(start, nextCell);
+        } catch (CellsAreNotAdjacentException e2) {
+            e2.printStackTrace();
+            throw new GhostIsTrappedException();
+        }
+    }
+}

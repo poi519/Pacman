@@ -4,7 +4,7 @@ interface Goal {
     public Int2 getCoordinates();
 }
 
-class GhostGoals {
+class GhostChasingGoals {
     final public static Goal RED = new Goal(){
         @Override
         public Int2 getCoordinates() {
@@ -71,6 +71,39 @@ class GhostGoals {
                 GameMap map = Game.getInstance().getMap();
                 return map.getClosestFreeCell(new Int2(map.getWidth() - 1, map.getHeight() - 1));
             }
+        }
+    };
+}
+
+class GhostWanderingGoals {
+    final public static Goal RED = new Goal(){
+        @Override
+        public Int2 getCoordinates() {
+            return new Int2(-1, -1);
+        }
+    };
+
+    final public static Goal PINK = new Goal() {
+        @Override
+        public Int2 getCoordinates() {
+            GameMap map = Game.getInstance().getMap();
+            return new Int2(map.getWidth(), -1);
+        }
+    };
+
+    final public static Goal BLUE = new Goal() {
+        @Override
+        public Int2 getCoordinates() {
+            GameMap map = Game.getInstance().getMap();
+            return new Int2(map.getWidth(), map.getHeight());
+        }
+    };
+
+    final public static Goal ORANGE = new Goal() {
+        @Override
+        public Int2 getCoordinates() {
+            GameMap map = Game.getInstance().getMap();
+            return new Int2(-1, map.getHeight());
         }
     };
 }
