@@ -1,7 +1,7 @@
 package com.example.Pacman;
 
 import java.util.*;
-
+//TODO remove ghost is trapped exception
 class GhostIsTrappedException extends Exception {}
 class AStarFailureException extends Exception {}
 

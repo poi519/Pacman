@@ -2,11 +2,8 @@ package com.example.Pacman;
 
 import android.util.Log;
 
-import java.util.Collections;
-import java.util.Comparator;
-
 enum GhostStatus {
-    WAITING, CHASING, FLEEING
+    WAITING, CHASING, WANDERING, FLEEING
 }
 
 public class Ghost extends Movable implements HasRadius {
@@ -22,8 +19,8 @@ public class Ghost extends Movable implements HasRadius {
         GhostStrategy strategy;
         if(name.equals("Blinky")) strategy = new AStarStrategy(GhostChasingGoals.RED);
         else if(name.equals("Pinky")) strategy = new AStarStrategy(GhostChasingGoals.PINK);
-        else if(name.equals("Inky")) strategy = new AStarStrategy(GhostChasingGoals.BLUE);
-        else strategy = new AStarStrategy(GhostChasingGoals.ORANGE);
+        else if(name.equals("Inky")) strategy = new SimpleStrategy(GhostChasingGoals.BLUE);
+        else strategy = new SimpleStrategy(GhostChasingGoals.ORANGE);
         return new Ghost(strategy, position);
     }
 
@@ -55,22 +52,8 @@ public class Ghost extends Movable implements HasRadius {
                 }
             } catch(GhostIsTrappedException e) {
                 e.printStackTrace();//TODO decide whether I need this
-                // something went wrong, let's choose a direction that minimizes the distance to pacman
-                final Int2 pacmanCell = Game.getInstance().getPacman().getCoordinates().toInt2();
-                Int2 nextCell = Collections.min(map.getFreeNeighbourCells(newCell), new Comparator<Int2>() {
-                    @Override
-                    public int compare(Int2 lhs, Int2 rhs) {
-                        return (int) Math.signum(GameMap.distance(lhs, pacmanCell) - GameMap.distance(rhs, pacmanCell));
-                    }
-                });
-                try {
-                    newDirection = GameMap.findDirectionBetween(newCell, nextCell);
-                } catch (CellsAreNotAdjacentException e2) {
-                    e2.printStackTrace();
-                    newDirection = getDirection();
-                }
-                setDirection(newDirection);
-                setCoordinates(newCell.toFloat2());
+                // something went wrong, let's stop for a while
+                setMoving(false);
             }
         } else
             setCoordinates(newCoordinates);
