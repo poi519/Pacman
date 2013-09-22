@@ -22,7 +22,7 @@ class GhostChasingGoals {
     final private static Goal RED = new Goal(){
         @Override
         public Int2 getCoordinates() {
-            return Game.getInstance().getPacman().getCoordinates().toInt2();
+            return Game.getInstance().getPacman().getCurrentCell();
         }
     };
 
@@ -34,7 +34,7 @@ class GhostChasingGoals {
             Pacman pacman = Game.getInstance().getPacman();
             Ghost pink = Game.getInstance().getGhosts().get(GhostColor.PINK);
             if(pink.seesPacman())
-                return pacman.getCoordinates().toInt2();
+                return pacman.getCurrentCell();
             Direction dir = pacman.getDirection();
             GameMap map = Game.getInstance().getMap();
             return map.findNextCrossroad(pacman.getCoordinates(), dir);
@@ -52,9 +52,9 @@ class GhostChasingGoals {
             Ghost blue = Game.getInstance().getGhosts().get(GhostColor.BLUE);
 
             if(blue.seesPacman())
-                return pacman.getCoordinates().toInt2();
+                return pacman.getCurrentCell();
 
-            final Int2 blueCell = blue.getCoordinates().toInt2();
+            final Int2 blueCell = blue.getCurrentCell();
             Int2 crossroad1 = PINK.getCoordinates();
             Set<Int2> crossroads2 = new HashSet<Int2>();
             Direction dir;
@@ -86,9 +86,9 @@ class GhostChasingGoals {
             Ghost orange = Game.getInstance().getGhosts().get(GhostColor.ORANGE);
 
             if(orange.seesPacman())
-                return pacman.getCoordinates().toInt2();
+                return pacman.getCurrentCell();
 
-            final Int2 blueCell = Game.getInstance().getGhosts().get(GhostColor.BLUE).getCoordinates().toInt2();
+            final Int2 blueCell = Game.getInstance().getGhosts().get(GhostColor.BLUE).getCurrentCell();
             Int2 crossroad1 = PINK.getCoordinates();
             Set<Int2> crossroads2 = new HashSet<Int2>();
             Direction dir;
@@ -106,7 +106,7 @@ class GhostChasingGoals {
                 }
             });
 
-            if(result.equals(orange.getCoordinates().toInt2())) result = crossroad1;
+            if(result.equals(orange.getCurrentCell())) result = crossroad1;
             return result;
         }
     };

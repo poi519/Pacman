@@ -4,6 +4,12 @@ abstract class Movable {
     abstract void updateInNewCell(Float2 newCoordinates);
     abstract void updateWhileStandingStill();
 
+    private Float2 coordinates;
+    private Int2 cell = new Int2(0, 0);
+    private Direction direction;
+    private float speed;
+    private boolean moving;
+
     Float2 getCoordinates() {
         return coordinates;
     }
@@ -11,11 +17,6 @@ abstract class Movable {
     void setCoordinates(Float2 coordinates) {
         this.coordinates = coordinates;
     }
-
-    private Float2 coordinates;
-    private Direction direction;
-    private float speed;
-    private boolean moving;
 
     public boolean isMoving() {
         return moving;
@@ -39,6 +40,12 @@ abstract class Movable {
 
     public void setSpeed(float speed) {
         this.speed = speed;
+    }
+
+    public Int2 getCurrentCell() {
+        cell.x = Math.round(coordinates.x);
+        cell.y = Math.round(coordinates.y);
+        return cell;
     }
 
     final public void update() {

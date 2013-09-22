@@ -1,5 +1,7 @@
 package com.example.Pacman;
 
+import android.util.Log;
+
 import java.util.*;
 
 public interface PathFinder {
@@ -72,6 +74,8 @@ abstract class AbstractAStarFinder<Node> {
 }
 
 class AStarFinder extends AbstractAStarFinder<Int2> implements PathFinder {
+    private final Map<Pair<Int2, Int2>, Direction> memo = new HashMap<Pair<Int2, Int2>, Direction>();
+
     @Override
     Set<Int2> getNeighbourNodes(Int2 cell) {
         return Game.getInstance().getMap().getFreeNeighbourCells(cell);
@@ -83,7 +87,20 @@ class AStarFinder extends AbstractAStarFinder<Int2> implements PathFinder {
     }
 
     public Direction findBestDirection(Int2 start, Int2 finish){
-            return GameMap.findDirectionBetween(start, findBestNextNode(start, finish));
+        Pair<Int2, Int2> p = new Pair<Int2, Int2>(start, finish);
+        Direction result;
+        if(memo.containsKey(p)) {
+            Log.d("AStar.Finder#findBestDirection", "Used memoized result");
+            return memo.get(p);
+        } else {
+            result = GameMap.findDirectionBetween(start, findBestNextNode(start, finish));
+            memo.put(p, result);
+            return result;
+        }
+    }
+
+    public void clearMemo() {
+        memo.clear();
     }
 }
 
@@ -92,5 +109,9 @@ class AStar {
         return finder;
     }
 
-    private static final PathFinder finder = new AStarFinder();
+    static void reset() {
+        finder.clearMemo();
+    }
+
+    private static final AStarFinder finder = new AStarFinder();
 }

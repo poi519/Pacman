@@ -68,7 +68,8 @@ public class Ghost extends Movable implements HasRadius {
                     //TODO consider blocked directions
                     newDirection = Direction.random();
             }
-            Log.d("Ghost.updateInNewCell", "New direction is " + newDirection);
+            if(newDirection == null)
+                Log.d("Ghost.updateInNewCell", "New direction is null");
             if(newDirection == getDirection()) {
                 setCoordinates(newCoordinates);
             } else if (newDirection != null) {
@@ -95,8 +96,8 @@ public class Ghost extends Movable implements HasRadius {
     }
 
     boolean seesPacman() {
-        Int2 pacmanCell = Game.getInstance().getPacman().getCoordinates().toInt2();
-        Int2 currentCell = getCoordinates().toInt2();
+        Int2 pacmanCell = Game.getInstance().getPacman().getCurrentCell();
+        Int2 currentCell = getCurrentCell();
         if(currentCell == pacmanCell)
             return true;
         Direction dir = GameMap.findDirectionBetween(currentCell, pacmanCell);

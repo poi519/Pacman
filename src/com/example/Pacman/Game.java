@@ -94,6 +94,7 @@ public class Game {
                 ghosts.put(c, new Ghost(c, position));
             }
         }
+        AStar.reset();
     }
 
     public void goToInitialPositions() {

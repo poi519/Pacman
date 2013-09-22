@@ -16,12 +16,22 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Game game = Game.getInstance();
     float tlx, tly, brx, bry;
 
+    private int cellWidth, cellHeight;
+    private Int2 aInt2 = new Int2(0, 0),
+                 bInt2 = new Int2(0, 0);
+
+    void updateCellDimensions() {
+        cellWidth = (int) ((brx - tlx) / game.getMap().getWidth());
+        cellHeight = (int) ((bry - tly) / game.getMap().getHeight());
+        Log.d("updateCellDimensions", "" + cellWidth + " " + cellHeight);
+    }
+
     public float getCellWidth() {
-        return (int) ((brx - tlx) / game.getMap().getWidth());
+        return cellWidth;
     }
 
     public float getCellHeight() {
-        return (int) ((bry - tly) / game.getMap().getHeight());
+        return cellHeight;
     }
 
     public int getScreenRadius(HasRadius smth) {
@@ -29,8 +39,23 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public Int2 toScreenCoordinates(Float2 coordinates) {
-        return new Int2(Math.round(tlx + getCellWidth() * (coordinates.x + 0.5f)),
-                                Math.round(tly + getCellHeight() * (coordinates.y + 0.5f)));
+        return new Int2((int) (tlx + getCellWidth() * (coordinates.x + 0.5f)),
+                        (int) (tly + getCellHeight() * (coordinates.y + 0.5f)));
+    }
+
+    public Int2 toScreenCoordinates(float x, float y) {
+        return new Int2((int) (tlx + getCellWidth() * (x + 0.5f)),
+                        (int) (tly + getCellHeight() * (y + 0.5f)));
+    }
+
+    public void mToScreenCoordinates(float x, float y, Int2 int2) {
+        int2.x = (int) (tlx + getCellWidth() * (x + 0.5f));
+        int2.y = (int) (tly + getCellHeight() * (y + 0.5f));
+    }
+
+    public void mToScreenCoordinates(Float2 coordinates, Int2 int2) {
+        int2.x = (int) (tlx + getCellWidth() * (coordinates.x + 0.5f));
+        int2.y = (int) (tly + getCellHeight() * (coordinates.y + 0.5f));
     }
 
     public float toAngle(Direction dir) {
@@ -138,23 +163,23 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void drawWall(Canvas c, float x, float y) {
         paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.FILL);
-        Int2 tl = toScreenCoordinates(new Float2(x - 0.5f, y - 0.5f));
-        Int2 br = toScreenCoordinates(new Float2(x + 0.5f, y + 0.5f));
-        c.drawRect(tl.x, tl.y, br.x, br.y, paint);
+        mToScreenCoordinates(x - 0.5f, y - 0.5f, aInt2);
+        mToScreenCoordinates(x + 0.5f, y + 0.5f, bInt2);
+        c.drawRect(aInt2.x, aInt2.y, bInt2.x, bInt2.y, paint);
     }
 
     public void drawDot(Canvas c, float x, float y) {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
-        Int2 sc = toScreenCoordinates(new Float2(x, y));
-        c.drawCircle(sc.x, sc.y, getScreenRadius(Location.DOT), paint);
+        mToScreenCoordinates(x, y, aInt2);
+        c.drawCircle(aInt2.x, aInt2.y, getScreenRadius(Location.DOT), paint);
     }
 
     public void drawEnergizer(Canvas c, float x, float y) {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
-        Int2 sc = toScreenCoordinates(new Float2(x, y));
-        c.drawCircle(sc.x, sc.y, getScreenRadius(Location.ENERGIZER), paint);
+        mToScreenCoordinates(x, y, aInt2);
+        c.drawCircle(aInt2.x, aInt2.y, getScreenRadius(Location.ENERGIZER), paint);
     }
 
     public void drawPacman(Canvas c) {
@@ -163,12 +188,12 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         Pacman pacman = game.getPacman();
         Float2 coordinates = pacman.getCoordinates();
-        Int2 screentl = toScreenCoordinates(new Float2(coordinates.x - 0.5f, coordinates.y - 0.5f));
-        Int2 screenbr = toScreenCoordinates(new Float2(coordinates.x + 0.5f, coordinates.y + 0.5f));
+        mToScreenCoordinates(coordinates.x - 0.5f, coordinates.y - 0.5f, aInt2);
+        mToScreenCoordinates(coordinates.x + 0.5f, coordinates.y + 0.5f, bInt2);
         float zeroAngle = toAngle(pacman.getDirection());
         float coordinate = pacman.getDirection().isHorizontal() ? coordinates.x : coordinates.y;
         float mouthAngle = (float) Math.abs(90 * Math.sin(Math.PI * (coordinate - (int) coordinate)));//YEAH!
-        c.drawArc(new RectF(screentl.x, screentl.y, screenbr.x, screenbr.y),
+        c.drawArc(new RectF(aInt2.x, aInt2.y, bInt2.x, bInt2.y),
                 zeroAngle + mouthAngle / 2,
                 360 - mouthAngle, true, paint);
     }
@@ -198,8 +223,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
         paint.setStyle(Paint.Style.FILL);
         Ghost g = game.getGhosts().get(ghostColor);
-        Int2 screenCoordinates = toScreenCoordinates(g.getCoordinates());
-        canvas.drawCircle(screenCoordinates.x, screenCoordinates.y, getScreenRadius(g), paint);
+        mToScreenCoordinates(g.getCoordinates(), aInt2);
+        canvas.drawCircle(aInt2.x, aInt2.y, getScreenRadius(g), paint);
     }
 
     @Override
@@ -215,7 +240,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         tlx = 0; tly = 0;
         brx = this.getHeight(); bry = this.getHeight();
-
+        updateCellDimensions();
         final GestureDetector gdt = new GestureDetector(this.getContext(), new FlingListener());
         this.setOnTouchListener(new View.OnTouchListener() {
             @Override

@@ -19,6 +19,7 @@ public class GameActivity extends Activity {
         game.loadLevel(0);
 
         GameView gameView = new GameView(this);
+
         setContentView(gameView);
     }
 
