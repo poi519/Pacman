@@ -1,9 +1,9 @@
 28 29
 Pacman 14 21
-Blinky 12 13
-Pinky 13 13
-Inky 14 13
-Clyde 15 13
+RED 12 13
+PINK 13 13
+BLUE 14 13
+ORANGE 15 13
 wwwwwwwwwwwwwwwwwwwwwwwwwwww
 w............ww............w
 w.wwww.wwwww.ww.wwwww.wwww.w

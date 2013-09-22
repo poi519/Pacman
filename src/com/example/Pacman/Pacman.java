@@ -3,6 +3,7 @@ package com.example.Pacman;
 import android.util.Log;
 
 public class Pacman extends Movable implements HasRadius {
+    final static float BASE_SPEED = 2f;
     private Direction scheduledDirection;
 
     public Direction getScheduledDirection() {
@@ -21,7 +22,7 @@ public class Pacman extends Movable implements HasRadius {
         setCoordinates(coordinates.toFloat2());
         setDirection(Direction.RIGHT);
         setScheduledDirection(Direction.RIGHT);
-        setSpeed(2.0f);
+        setSpeed(BASE_SPEED);
         setMoving(false);
     }
 

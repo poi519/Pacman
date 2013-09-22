@@ -145,19 +145,53 @@ public class GameMap {
         return cell;
     }
 
-    public static Direction findDirectionBetween(Int2 start, Int2 finish) throws CellsAreNotAdjacentException {
+    public static Direction findDirectionBetween(Int2 start, Int2 finish) {
         int dx = finish.x - start.x,
             dy = finish.y - start.y;
-        switch (dx) {
-            case 1 : return Direction.RIGHT;
-            case -1: return Direction.LEFT;
-            default:
-                switch (dy) {
-                    case 1 : return Direction.DOWN;
-                    case -1: return Direction.UP;
-                    default:
-                        throw new CellsAreNotAdjacentException();
+        if(dx * dy != 0)
+            return null;
+        if(dx > 0)
+            return Direction.RIGHT;
+        else if(dx < 0)
+            return Direction.LEFT;
+        else if(dy > 0)
+            return Direction.DOWN;
+        else if(dy < 0)
+            return Direction.UP;
+        else
+            return null; //haha
+    }
+
+    Int2 findNextCrossroad(Float2 coordinates, Direction direction) {
+        Int2 c1 = coordinates.toInt2(),
+             c2;
+        if(getFreeNeighbourCells(c1).size() > 2) return c1;
+        Location l2;
+        Direction d2;
+        Set<Int2> neighbours;
+        while(true) {
+            c2 = direction.nextCell(c1);
+            l2 = getLocation(c2);
+            if(l2 != Location.WALL && l2 != null) {
+                if(getFreeNeighbourCells(c2).size() > 2)
+                    return c2;
+                else
+                    c1 = c2;
+            } else {
+                Log.d("findNextCrossroad", "angle branch");
+                neighbours = getFreeNeighbourCells(c1);
+                if(neighbours.size() == 1) {
+                    direction = direction.opposite();
+                } else {
+                    for(Int2 n : getFreeNeighbourCells(c1)) {
+                        d2 = findDirectionBetween(c1, n);
+                        if(d2.opposite() != direction) {
+                            direction = d2;
+                            break;
+                        }
+                    }
                 }
+            }
         }
     }
 
@@ -192,9 +226,12 @@ public class GameMap {
     public void setArray(Location[][] array) {
         this.array = array;
     }
-    //TODO add out of bounds checks
+
     public Location getLocation(Int2 cell) {
-        return getArray()[cell.x][cell.y];
+        if(cell.x < 0 || cell.y < 0 || cell.x >= width || cell.y >= height)
+            return null;
+        else
+            return getArray()[cell.x][cell.y];
     }
 
     public void setLocation(Int2 cell, Location value) {

@@ -99,8 +99,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void onDraw(Canvas canvas) {
         drawMap(canvas);
-        for(String ghostName : game.getGhosts().keySet()) {
-            drawGhost(ghostName, canvas);
+        for(GhostColor ghostColor : game.getGhosts().keySet()) {
+            drawGhost(ghostColor, canvas);
         }
         drawPacman(canvas);
         drawScore(canvas);
@@ -189,17 +189,15 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 brx + 16, bry / 2 + 32, paint);
     }
 
-    public void drawGhost(String ghostName, Canvas canvas) {
-        if(ghostName.equals("Blinky"))
-            paint.setColor(Color.RED);
-        else if(ghostName.equals("Pinky"))
-            paint.setColor(0xFFFFC0CB);
-        else if (ghostName.equals("Inky"))
-            paint.setColor(Color.BLUE);
-        else
-            paint.setColor(0xFFFF5500);
+    public void drawGhost(GhostColor ghostColor, Canvas canvas) {
+        switch (ghostColor) {
+            case RED: paint.setColor(Color.RED); break;
+            case PINK: paint.setColor(0xFFFFC0CB); break;
+            case BLUE: paint.setColor(Color.BLUE); break;
+            default: paint.setColor(0xFFFF5500);
+        }
         paint.setStyle(Paint.Style.FILL);
-        Ghost g = game.getGhosts().get(ghostName);
+        Ghost g = game.getGhosts().get(ghostColor);
         Int2 screenCoordinates = toScreenCoordinates(g.getCoordinates());
         canvas.drawCircle(screenCoordinates.x, screenCoordinates.y, getScreenRadius(g), paint);
     }

@@ -6,10 +6,17 @@ import java.util.Map;
 public class Game {
     private Pacman pacman;
     private GameMap map;
+    private Level level;
     private long score;
     public final float REFRESH_RATE;
-    private Map<String, Ghost> ghosts;
+    private Map<GhostColor, Ghost> ghosts;
+    private float time;
+
     private static final Game instance = new Game();
+
+    public Level getLevel() {
+        return level;
+    }
 
     public int getLives() {
         return lives;
@@ -21,11 +28,11 @@ public class Game {
 
     private int lives;
 
-    public Map<String, Ghost> getGhosts() {
+    public Map<GhostColor, Ghost> getGhosts() {
         return ghosts;
     }
 
-    public void setGhosts(Map<String, Ghost> ghosts) {
+    public void setGhosts(Map<GhostColor, Ghost> ghosts) {
         this.ghosts = ghosts;
     }
 
@@ -50,8 +57,9 @@ public class Game {
     }
 
     private Game() {
-        ghosts = new HashMap<String, Ghost>();
+        ghosts = new HashMap<GhostColor, Ghost>();
         REFRESH_RATE = 60;
+        time = 0;
         setupNewGame();
     }
 
@@ -65,13 +73,16 @@ public class Game {
         lives = 3;
     }
 
+    public void loadLevel(int n) {
+        level = new Level(n);
+        pacman.setSpeed(Pacman.BASE_SPEED * level.getSpeedFactor());
+        for(Ghost g : ghosts.values()) {
+            g.setSpeed(Ghost.BASE_SPEED * level.getSpeedFactor());
+        }
+    }
 
     public void loadMap(GameMap map) {
         this.map = map;
-        goToInitialPositions();
-    }
-
-    public void goToInitialPositions() {
         ghosts.clear();
         Int2 position;
         for(String name : map.getInitialPositions().keySet()){
@@ -79,7 +90,27 @@ public class Game {
             if(name.equals("Pacman")) {
                 this.pacman = new Pacman(position);
             } else {
-                ghosts.put(name, Ghost.makeGhost(name, position));
+                GhostColor c = GhostColor.valueOf(name);
+                ghosts.put(c, new Ghost(c, position));
+            }
+        }
+    }
+
+    public void goToInitialPositions() {
+        Float2 position;
+        Ghost g;
+        for(String name : map.getInitialPositions().keySet()){
+            position = map.getInitialPositions().get(name).toFloat2();
+            if(name.equals("Pacman")) {
+                pacman.setCoordinates(position);
+                pacman.setMoving(false);
+            } else {
+                GhostColor c = GhostColor.valueOf(name);
+                g = ghosts.get(c);
+                g.setCoordinates(position);
+                g.setMoving(false);
+                g.setStatus(GhostStatus.WAITING);
+                g.setWaitTimeout(5);
             }
         }
     }
@@ -89,15 +120,19 @@ public class Game {
     }
 
     public void update(){
+        float newTime = time + 1 / REFRESH_RATE;
+        level.runScript(time, newTime);
+        time = newTime;
         pacman.update();
         for(Ghost g : ghosts.values()) {
             g.update();
-            if(g.status != GhostStatus.FLEEING
+            if(g.getStatus() != GhostStatus.FLEEING
                 && GameMap.distance(g.getCoordinates(),
                     pacman.getCoordinates()) < (g.getRadius() + pacman.getRadius())) {
                 //Pacman's caught
                 lives--;
                 goToInitialPositions();
+                time = 0;
                 break;
             }
         }

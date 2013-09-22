@@ -3,7 +3,6 @@ package com.example.Pacman;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 
 import java.io.IOException;
@@ -15,7 +14,10 @@ public class GameActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         game.loadMap(GameMap.loadInputStream(openTextAsset("maps/", "level1.txt")));
+        game.loadLevel(0);
+
         GameView gameView = new GameView(this);
         setContentView(gameView);
     }

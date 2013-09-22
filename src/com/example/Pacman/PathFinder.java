@@ -1,24 +1,19 @@
 package com.example.Pacman;
 
 import java.util.*;
-//TODO remove ghost is trapped exception
-class GhostIsTrappedException extends Exception {}
-class AStarFailureException extends Exception {}
 
-public interface GhostStrategy {
-    public Direction findBestDirection(Int2 cell) throws GhostIsTrappedException;
+public interface PathFinder {
+    public Direction findBestDirection(Int2 from, Int2 to);
 }
 
-abstract class AbstractAStarStrategy<Node> {
+abstract class AbstractAStarFinder<Node> {
     abstract Set<Node> getNeighbourNodes(Node cell);
-    abstract Node goalNode();
     abstract double heuristicCostEstimate(Node start, Node finish);
 
-    public Node findBestNextNode(Node start) throws AStarFailureException {
+    public Node findBestNextNode(Node start, Node goalNode) {
         Set<Node> closedSet = new HashSet<Node>(),
                 openSet = new HashSet<Node>();
         openSet.add(start);
-        Node goalNode = goalNode();
 
         Map<Node, Node> cameFrom = new HashMap<Node, Node>();
         final Map<Node, Double>    gScore = new HashMap<Node, Double>(), // Cost from start along best known path.
@@ -54,7 +49,7 @@ abstract class AbstractAStarStrategy<Node> {
                 }
             }
         }
-        throw new AStarFailureException();
+        return null;//haha
     }
 
     private List<Node> reconstructPath(Map<Node, Node> cameFrom,
@@ -76,23 +71,10 @@ abstract class AbstractAStarStrategy<Node> {
     }
 }
 
-class CellsAreNotAdjacentException extends Exception {}
-
-class AStarStrategy extends AbstractAStarStrategy<Int2> implements GhostStrategy {
-    private Goal goal;
-
-    public AStarStrategy(Goal goal) {
-        this.goal = goal;
-    }
-
+class AStarFinder extends AbstractAStarFinder<Int2> implements PathFinder {
     @Override
     Set<Int2> getNeighbourNodes(Int2 cell) {
         return Game.getInstance().getMap().getFreeNeighbourCells(cell);
-    }
-
-    @Override
-    Int2 goalNode() {
-        return goal.getCoordinates();
     }
 
     @Override
@@ -100,40 +82,15 @@ class AStarStrategy extends AbstractAStarStrategy<Int2> implements GhostStrategy
         return Math.abs(finish.x - start.x) + Math.abs(finish.y - start.y);
     }
 
-    public Direction findBestDirection(Int2 start) throws GhostIsTrappedException {
-        try {
-            return GameMap.findDirectionBetween(start, findBestNextNode(start));
-        } catch (AStarFailureException e) {
-            e.printStackTrace();
-            throw new GhostIsTrappedException();
-        } catch (CellsAreNotAdjacentException e) {
-            e.printStackTrace();
-            throw new GhostIsTrappedException();
-        }
+    public Direction findBestDirection(Int2 start, Int2 finish){
+            return GameMap.findDirectionBetween(start, findBestNextNode(start, finish));
     }
 }
 
-class SimpleStrategy implements GhostStrategy {
-    private Goal goal;
-
-    public SimpleStrategy(Goal goal) {
-        this.goal = goal;
+class AStar {
+    static PathFinder getFinder() {
+        return finder;
     }
 
-    public Direction findBestDirection(Int2 start) throws GhostIsTrappedException {
-        final Int2 goalCell = goal.getCoordinates();
-        GameMap map = Game.getInstance().getMap();
-        Int2 nextCell = Collections.min(map.getFreeNeighbourCells(start), new Comparator<Int2>() {
-            @Override
-            public int compare(Int2 lhs, Int2 rhs) {
-                return (int) Math.signum(GameMap.distance(lhs, goalCell) - GameMap.distance(rhs, goalCell));
-            }
-        });
-        try {
-            return GameMap.findDirectionBetween(start, nextCell);
-        } catch (CellsAreNotAdjacentException e2) {
-            e2.printStackTrace();
-            throw new GhostIsTrappedException();
-        }
-    }
+    private static final PathFinder finder = new AStarFinder();
 }
