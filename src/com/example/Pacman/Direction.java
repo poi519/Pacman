@@ -28,4 +28,22 @@ enum Direction {
         return (this.isHorizontal() == other.isHorizontal());
     }
 
+    static Direction random() {
+        int i = (int) (Math.random() * 4);
+        switch (i) {
+            case 0: return UP;
+            case 1: return DOWN;
+            case 2: return LEFT;
+            default: return RIGHT;
+        }
+    }
+
+    Direction opposite() {
+        switch(this) {
+            case UP: return DOWN;
+            case DOWN: return UP;
+            case RIGHT: return LEFT;
+            default: return RIGHT;
+        }
+    }
 }
