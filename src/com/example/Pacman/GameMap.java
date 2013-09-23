@@ -195,6 +195,22 @@ public class GameMap {
         }
     }
 
+    Int2 mTorify(Int2 int2) {
+        if(int2.x == width) int2.x = 0;
+        if(int2.x == -1) int2.x = width - 1;
+        if(int2.y == height) int2.y = 0;
+        if(int2.y == -1) int2.y = height - 1;
+        return int2;
+    }
+
+    Float2 mTorify(Float2 float2) {
+        if(float2.x >= width - 1) float2.x -= width - 1;
+        if(float2.x <= 0) float2.x += width - 1;
+        if(float2.y >= height - 1) float2.y -= height - 1;
+        if(float2.y <= 0) float2.y += height - 1;
+        return float2;
+    }
+
     public static double distance(Int2 c1, Int2 c2) {
         return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
     }

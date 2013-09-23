@@ -62,6 +62,7 @@ abstract class Movable {
                 case RIGHT:
                     newCoordinates.x += dr; break;
             }
+            Game.getInstance().getMap().mTorify(newCoordinates);
             if(((int) newCoordinates.x != (int) coordinates.x
                 || (int) newCoordinates.y != (int) coordinates.y)) {     //passed through a cell center;
                 updateInNewCell(newCoordinates);

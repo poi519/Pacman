@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class GameActivity extends Activity {
-    Game game = Game.getInstance();
+    final Game game = Game.getInstance();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

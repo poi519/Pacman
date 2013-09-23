@@ -9,7 +9,7 @@ class GameThread extends Thread {
     private final long TICK = 16;
     private final int MAX_FRAMES_TO_SKIP = 6;
     private final SurfaceHolder _surfaceHolder; //+final hope this works...
-    private GameView _panel;
+    private final GameView _panel;
     private boolean _run = false;
 
     public GameThread(SurfaceHolder surfaceHolder, GameView panel) {

@@ -10,14 +10,14 @@ import android.view.*;
 
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
     GameThread _thread;
-    Paint paint = new Paint();
+    final Paint paint = new Paint();
 
-    Game game = Game.getInstance();
+    final Game game = Game.getInstance();
     float tlx, tly, brx, bry;
 
     private int cellWidth, cellHeight;
-    private Int2 aInt2 = new Int2(0, 0),
-                 bInt2 = new Int2(0, 0);
+    private final Int2 aInt2 = new Int2(0, 0),
+                       bInt2 = new Int2(0, 0);
 
     void updateCellDimensions() {
         cellWidth = (int) ((brx - tlx) / game.getMap().getWidth());

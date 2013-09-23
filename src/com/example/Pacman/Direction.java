@@ -11,7 +11,7 @@ enum Direction {
             case LEFT: result.x--; break;
             case RIGHT: result.x++; break;
         }
-        return result;
+        return Game.getInstance().getMap().mTorify(result);
     }
 
     public boolean isHorizontal() {
