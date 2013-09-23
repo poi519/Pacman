@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.*;
 
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
-    private final long TICK = 16;
     GameThread _thread;
     Paint paint = new Paint();
 
@@ -65,54 +64,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             case DOWN: return 90;
             case UP: return 270;
             default: return 0;
-        }
-    }
-
-    class GameThread extends Thread {
-        private final SurfaceHolder _surfaceHolder; //+final hope this works...
-        private GameView _panel;
-        private boolean _run = false;
-
-        public GameThread(SurfaceHolder surfaceHolder, GameView panel) {
-            _surfaceHolder = surfaceHolder;
-            _panel = panel;
-        }
-
-        public void setRunning(boolean run) { //Allow us to stop the thread
-            _run = run;
-        }
-
-        @Override
-        public void run() {
-            Canvas c;
-            long timePrevFrame = 0;
-
-            while (_run) {     //When setRunning(false) occurs, _run is
-                c = null;      //set to false and loop ends, stopping thread
-
-                long timeNow = System.currentTimeMillis();
-                long timeDelta = timeNow - timePrevFrame;
-                if ( timeDelta < TICK){
-                    try{
-                        Thread.sleep(TICK - timeDelta);
-                    }catch(InterruptedException e){
-                        Log.d("Pacman", e.getMessage());
-                    }
-                }
-                timePrevFrame = System.currentTimeMillis();
-
-                try {
-                    c = _surfaceHolder.lockCanvas(null);
-                    synchronized (_surfaceHolder) {
-                        _panel.game.update();
-                        postInvalidate();
-                    }
-                } finally {
-                    if (c != null) {
-                        _surfaceHolder.unlockCanvasAndPost(c);
-                    }
-                }
-            }
         }
     }
 
