@@ -37,16 +37,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return (int) (Math.min(getCellHeight(), getCellWidth()) * smth.getRadius());
     }
 
-    public Int2 toScreenCoordinates(Float2 coordinates) {
-        return new Int2((int) (tlx + getCellWidth() * (coordinates.x + 0.5f)),
-                        (int) (tly + getCellHeight() * (coordinates.y + 0.5f)));
-    }
-
-    public Int2 toScreenCoordinates(float x, float y) {
-        return new Int2((int) (tlx + getCellWidth() * (x + 0.5f)),
-                        (int) (tly + getCellHeight() * (y + 0.5f)));
-    }
-
     public void mToScreenCoordinates(float x, float y, Int2 int2) {
         int2.x = (int) (tlx + getCellWidth() * (x + 0.5f));
         int2.y = (int) (tly + getCellHeight() * (y + 0.5f));
@@ -81,6 +71,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         drawPacman(canvas);
         drawScore(canvas);
         drawLives(canvas);
+        drawLevelInfo(canvas);
     }
 
     public void drawMap(Canvas c) {
@@ -165,12 +156,27 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 brx + 16, bry / 2 + 32, paint);
     }
 
+    public void drawLevelInfo(Canvas canvas) {
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setTextSize(16);
+        canvas.drawText("Level: " + game.getLevel().getNumber(),
+                brx + 16, bry / 2 - 64, paint);
+        canvas.drawText("Dots: " + game.getMap().getDotsCount(),
+                brx + 16, bry / 2 - 32, paint);
+    }
+
     public void drawGhost(GhostColor ghostColor, Canvas canvas) {
-        switch (ghostColor) {
-            case RED: paint.setColor(Color.RED); break;
-            case PINK: paint.setColor(0xFFFFC0CB); break;
-            case BLUE: paint.setColor(Color.BLUE); break;
-            default: paint.setColor(0xFFFF5500);
+        switch (game.getGhosts().get(ghostColor).getStatus()) {
+        case FLEEING: paint.setColor(Color.GRAY); break;
+        case RETURNING: paint.setColor(Color.DKGRAY); break;
+        default:
+            switch (ghostColor) {
+                case RED: paint.setColor(Color.RED); break;
+                case PINK: paint.setColor(0xFFFFC0CB); break;
+                case BLUE: paint.setColor(Color.BLUE); break;
+                default: paint.setColor(0xFFFF5500);
+            }
         }
         paint.setStyle(Paint.Style.FILL);
         Ghost g = game.getGhosts().get(ghostColor);

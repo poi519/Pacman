@@ -8,7 +8,7 @@ import java.util.Set;
 interface Goal {
     public Int2 getCoordinates();
 }
-
+//TODO use getDirectionsFrom(c)
 class GhostChasingGoals {
     static Goal get(GhostColor c) {
         switch (c) {

@@ -1,6 +1,7 @@
 package com.example.Pacman;
 
 abstract class Movable {
+    abstract void updateEveryTick();
     abstract void updateInNewCell(Float2 newCoordinates);
     abstract void updateWhileStandingStill();
 
@@ -51,6 +52,7 @@ abstract class Movable {
     final public void update() {
         float dr = speed * 1f / Game.getInstance().REFRESH_RATE;
         Float2 newCoordinates = new Float2(coordinates);
+        updateEveryTick();
         if(moving) {
             switch(direction) {
                 case UP:

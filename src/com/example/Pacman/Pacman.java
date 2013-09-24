@@ -59,8 +59,12 @@ public class Pacman extends Movable implements HasRadius {
     }
 
     @Override
-    public void updateInNewCell(Float2 newCoordinates) {
+    public void updateEveryTick() {
         eat();
+    }
+
+    @Override
+    public void updateInNewCell(Float2 newCoordinates) {
         if(getScheduledDirection() != getDirection()    //direction change was scheduled
            && tryChangeDirection()) {                   //and happened
             //Do nothing
@@ -79,18 +83,24 @@ public class Pacman extends Movable implements HasRadius {
 
     @Override
     public void updateWhileStandingStill() {
-        eat();
+        //do nothing
     }
 
     public void eat(){
         Int2 coordinates = getCurrentCell();
         GameMap map = Game.getInstance().getMap();
         Location location = map.getLocation(coordinates);
+        Game.getInstance().increaseScore(location.getScore());
         switch(location){
-            case DOT:
             case ENERGIZER:
                 map.setLocation(coordinates, Location.SPACE);
-                Game.getInstance().increaseScore(location.getScore());
+                for(Ghost g : Game.getInstance().getGhosts().values()) {
+                    g.flee();
+                }
+                break;
+            case DOT:
+                map.removeDot(coordinates);
+                break;
         }
     }
 }

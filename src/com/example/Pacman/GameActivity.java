@@ -15,11 +15,10 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        game.loadMap(GameMap.loadInputStream(openTextAsset("maps/", "level1.txt")));
+        game.setActivity(this);
         game.loadLevel(0);
 
         GameView gameView = new GameView(this);
-
         setContentView(gameView);
     }
 

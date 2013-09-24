@@ -12,6 +12,11 @@ public class GameMap {
     private int height;
     private Map<String, Int2> initialPositions;
     private Location[][] array;
+    private int dotsCount;
+
+    public int getDotsCount() {
+        return dotsCount;
+    }
 
     public Map<String, Int2> getInitialPositions() {
         return initialPositions;
@@ -26,6 +31,7 @@ public class GameMap {
         this.height = height;
         array = new Location[width][height];
         initialPositions = new HashMap<String, Int2>();
+        dotsCount = 0;
     }
 
     static GameMap loadInputStream(InputStream fis) {
@@ -77,6 +83,7 @@ public class GameMap {
         int x = 0, y = 0;
         int i = fis.read();
         char c = (char) i;
+        Location l;
         while(i != -1) {
             //Log.d("GameMap.readArrayFromStream", "Read " + Character.toString(c));
             if(c == '\n') {
@@ -86,7 +93,10 @@ public class GameMap {
                 x = 0;
                 y++;
             } else {
-                getArray()[x][y] = Location.fromChar(c);
+                l =Location.fromChar(c);
+                getArray()[x][y] = l;
+                if(l == Location.DOT)
+                    dotsCount++;
                 x++;
             }
             i = fis.read();
@@ -209,6 +219,38 @@ public class GameMap {
         if(float2.y >= height - 1) float2.y -= height - 1;
         if(float2.y <= 0) float2.y += height - 1;
         return float2;
+    }
+
+    Set<Direction> getDirectionsFrom(Int2 cell) {
+        Direction[] directions = {Direction.RIGHT, Direction.LEFT, Direction.UP, Direction.DOWN};
+        Set<Direction> result = new HashSet<Direction>();
+        for(Direction d : directions) {
+            if(isFree(d.nextCell(cell))){
+                result.add(d);
+            }
+        }
+        return result;
+    }
+
+    Direction getRandomDirection(Int2 cell) {
+        Set<Direction> dirs= getDirectionsFrom(cell);
+        int size = dirs.size();
+        int item = (int) (Math.random() * size); // In real life, the Random object should be rather more shared than this
+        int i = 0;
+        for(Direction dir : dirs)
+        {
+            if (i == item)
+                return dir;
+            i = i + 1;
+        }
+        return null;
+    }
+
+    public void removeDot(Int2 cell) {
+        setLocation(cell, Location.SPACE);
+        dotsCount--;
+        if(dotsCount <= 0)
+            Game.getInstance().nextLevel();
     }
 
     public static double distance(Int2 c1, Int2 c2) {

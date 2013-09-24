@@ -11,8 +11,16 @@ public class Game {
     public final float REFRESH_RATE;
     private Map<GhostColor, Ghost> ghosts;
     private float time;
-
+    private GameActivity activity;
     private static final Game instance = new Game();
+
+    public GameActivity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(GameActivity activity) {
+        this.activity = activity;
+    }
 
     public Level getLevel() {
         return level;
@@ -75,9 +83,19 @@ public class Game {
 
     public void loadLevel(int n) {
         level = new Level(n);
+        loadMap(GameMap.loadInputStream(activity.openTextAsset("maps/", "level1.txt")));
         pacman.setSpeed(Pacman.BASE_SPEED * level.getSpeedFactor());
         for(Ghost g : ghosts.values()) {
             g.setSpeed(Ghost.BASE_SPEED * level.getSpeedFactor());
+        }
+    }
+
+    public void nextLevel() {
+        int n = level.getNumber();
+        if(n >= 10) {
+            //game over
+        } else {
+            loadLevel(n + 1);
         }
     }
 
@@ -111,7 +129,7 @@ public class Game {
                 g.setCoordinates(position);
                 g.setMoving(false);
                 g.setStatus(GhostStatus.WAITING);
-                g.setWaitTimeout(5);
+                g.setTimeout(5);
             }
         }
     }
@@ -127,14 +145,19 @@ public class Game {
         pacman.update();
         for(Ghost g : ghosts.values()) {
             g.update();
-            if(g.getStatus() != GhostStatus.FLEEING
-                && GameMap.distance(g.getCoordinates(),
-                    pacman.getCoordinates()) < (g.getRadius() + pacman.getRadius())) {
-                //Pacman's caught
-                lives--;
-                goToInitialPositions();
-                time = 0;
-                break;
+            GhostStatus st = g.getStatus();
+            if(st != GhostStatus.RETURNING
+                && GameMap.distance(g.getCoordinates(), pacman.getCoordinates()) < (g.getRadius() + pacman.getRadius())) {
+                if(st == GhostStatus.FLEEING) {
+                    g.eaten();
+                    score += 1000;
+                } else {
+                    //Pacman's caught
+                    lives--;
+                    goToInitialPositions();
+                    time = 0;
+                    break;
+                }
             }
         }
     }

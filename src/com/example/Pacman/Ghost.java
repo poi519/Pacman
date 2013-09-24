@@ -7,7 +7,7 @@ enum GhostColor {
 }
 
 enum GhostStatus {
-    WAITING, CHASING, WANDERING, FLEEING
+    WAITING, CHASING, WANDERING, FLEEING, RETURNING
 }
 
 public class Ghost extends Movable implements HasRadius {
@@ -15,14 +15,16 @@ public class Ghost extends Movable implements HasRadius {
     final Goal chasingGoal, wanderingGoal;
     private final PathFinder pathFinder = AStar.getFinder();
     private GhostStatus status;
-    private float waitTimeout;
+    private float timeout;
+    private boolean forceDirectionChange;
+    private Int2 initialPosition;
 
-    public float getWaitTimeout() {
-        return waitTimeout;
+    public float getTimeout() {
+        return timeout;
     }
 
-    public void setWaitTimeout(float waitTimeout) {
-        this.waitTimeout = waitTimeout;
+    public void setTimeout(float timeout) {
+        this.timeout = timeout;
     }
 
     public GhostStatus getStatus() {
@@ -33,7 +35,6 @@ public class Ghost extends Movable implements HasRadius {
         this.status = status;
     }
 
-
     public float getRadius() {
         return 0.5f;
     }
@@ -43,10 +44,22 @@ public class Ghost extends Movable implements HasRadius {
         this.wanderingGoal = GhostWanderingGoals.get(c);
         setSpeed(BASE_SPEED);
         status = GhostStatus.WAITING;
-        waitTimeout = 5;
+        timeout = 5;
         this.setMoving(false);
+        initialPosition = position;
         this.setCoordinates(position.toFloat2());
         this.setDirection(Direction.DOWN);
+    }
+
+    @Override
+    void updateEveryTick() {
+        if(status == GhostStatus.FLEEING) {
+            timeout = timeout - 1 / Game.getInstance().REFRESH_RATE;
+            if(timeout < 0) {
+                status = GhostStatus.CHASING;
+                forceDirectionChange = true;
+            }
+        }
     }
 
     @Override
@@ -55,7 +68,8 @@ public class Ghost extends Movable implements HasRadius {
         Direction newDirection;
         final GameMap map = Game.getInstance().getMap();
         if(map.getFreeNeighbourCells(newCell).size() > 2 //More than 2 free neighbours - cell is a crossroad
-            || !map.isFree(getDirection().nextCell(newCell))) //Or the current direction is blocked - mb an angle
+            || !map.isFree(getDirection().nextCell(newCell)) //Or the current direction is blocked - mb an angle
+            || forceDirectionChange) //Or the status has changed and the direction change is forced
         {
             switch (status) {
                 case CHASING:
@@ -64,9 +78,20 @@ public class Ghost extends Movable implements HasRadius {
                 case WANDERING:
                     newDirection = pathFinder.findBestDirection(newCell, wanderingGoal.getCoordinates());
                     break;
+                case FLEEING:
+                    newDirection = map.getRandomDirection(newCell);
+                    break;
+                case RETURNING:
+                    if(newCell.equals(initialPosition)) {
+                        status = GhostStatus.CHASING;
+                        updateInNewCell(newCoordinates);
+                    } else {
+                        newDirection = pathFinder.findBestDirection(newCell, initialPosition);
+                        break;
+                    }
                 default:
                     //TODO consider blocked directions
-                    newDirection = Direction.random();
+                    newDirection = map.getRandomDirection(newCell);
             }
             if(newDirection == null)
                 Log.d("Ghost.updateInNewCell", "New direction is null");
@@ -79,6 +104,7 @@ public class Ghost extends Movable implements HasRadius {
             // something went wrong, let's stop for a while
                 setMoving(false);
             }
+            forceDirectionChange = false;
         } else
             setCoordinates(newCoordinates);
     }
@@ -86,13 +112,25 @@ public class Ghost extends Movable implements HasRadius {
     @Override
     void updateWhileStandingStill() {
         if(status == GhostStatus.WAITING) {
-            waitTimeout -= 1f / Game.getInstance().REFRESH_RATE;
-            if(waitTimeout <= 0)
+            timeout -= 1f / Game.getInstance().REFRESH_RATE;
+            if(timeout <= 0)
                 status = GhostStatus.CHASING;
         } else {
             setMoving(true);
             updateInNewCell(getCoordinates());
         }
+    }
+
+    void flee() {
+        if(status != GhostStatus.RETURNING)
+            status = GhostStatus.FLEEING;
+        timeout = Game.getInstance().getLevel().getEnergizerDuration();
+        forceDirectionChange = true;
+    }
+
+    void eaten() {
+        status = GhostStatus.RETURNING;
+        forceDirectionChange = true;
     }
 
     boolean seesPacman() {
