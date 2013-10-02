@@ -8,7 +8,7 @@ import java.util.Set;
 interface Goal {
     public Int2 getCoordinates();
 }
-//TODO use getDirectionsFrom(c)
+
 class GhostChasingGoals {
     static Goal get(GhostColor c) {
         switch (c) {
@@ -57,11 +57,9 @@ class GhostChasingGoals {
             final Int2 blueCell = blue.getCurrentCell();
             Int2 crossroad1 = PINK.getCoordinates();
             Set<Int2> crossroads2 = new HashSet<Int2>();
-            Direction dir;
-            for(Int2 n : map.getFreeNeighbourCells(crossroad1)) {
-                dir = GameMap.findDirectionBetween(crossroad1, n);
+            for(Direction dir : map.getDirectionsFrom(crossroad1)) {
                 if(dir == pacman.getDirection().opposite()) continue;
-                crossroads2.add(map.findNextCrossroad(n.toFloat2(), dir));
+                crossroads2.add(map.findNextCrossroad(crossroad1.toFloat2(), dir));
             }
             Int2 result = Collections.min(crossroads2, new Comparator<Int2>() {
                 @Override
@@ -91,11 +89,9 @@ class GhostChasingGoals {
             final Int2 blueCell = Game.getInstance().getGhosts().get(GhostColor.BLUE).getCurrentCell();
             Int2 crossroad1 = PINK.getCoordinates();
             Set<Int2> crossroads2 = new HashSet<Int2>();
-            Direction dir;
-            for(Int2 n : map.getFreeNeighbourCells(crossroad1)) {
-                dir = GameMap.findDirectionBetween(crossroad1, n);
+            for(Direction dir : map.getDirectionsFrom(crossroad1)) {
                 if(dir == pacman.getDirection().opposite()) continue;
-                crossroads2.add(map.findNextCrossroad(n.toFloat2(), dir));
+                crossroads2.add(map.findNextCrossroad(crossroad1.toFloat2(), dir));
             }
             Int2 result = Collections.min(crossroads2, new Comparator<Int2>() {
                 @Override
