@@ -18,6 +18,8 @@ public class GameActivity extends Activity {
         game.setActivity(this);
         game.loadLevel(0);
 
+        SoundSystem.initSounds(this);
+
         GameView gameView = new GameView(this);
         setContentView(gameView);
     }

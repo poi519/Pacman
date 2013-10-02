@@ -150,9 +150,11 @@ public class Game {
                 && GameMap.distance(g.getCoordinates(), pacman.getCoordinates()) < (g.getRadius() + pacman.getRadius())) {
                 if(st == GhostStatus.FLEEING) {
                     g.eaten();
+                    SoundSystem.playSound(SoundSystem.EAT_GHOST);
                     score += 1000;
                 } else {
                     //Pacman's caught
+                    SoundSystem.playSound(SoundSystem.GAME_OVER);
                     lives--;
                     goToInitialPositions();
                     time = 0;

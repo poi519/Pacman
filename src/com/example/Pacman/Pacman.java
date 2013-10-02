@@ -97,9 +97,11 @@ public class Pacman extends Movable implements HasRadius {
                 for(Ghost g : Game.getInstance().getGhosts().values()) {
                     g.flee();
                 }
+                SoundSystem.playSound(SoundSystem.EAT_ENERGIZER);
                 break;
             case DOT:
                 map.removeDot(coordinates);
+                SoundSystem.playSound(SoundSystem.EAT);
                 break;
         }
     }

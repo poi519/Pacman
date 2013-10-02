@@ -84,6 +84,7 @@ public class Ghost extends Movable implements HasRadius {
                 case RETURNING:
                     if(newCell.equals(initialPosition)) {
                         status = GhostStatus.CHASING;
+                        SoundSystem.playSound(SoundSystem.GHOST_SPAWN);
                         updateInNewCell(newCoordinates);
                     } else {
                         newDirection = pathFinder.findBestDirection(newCell, initialPosition);
